@@ -1,0 +1,61 @@
+// =========================================================
+// * Vuetify Material Dashboard - v2.1.0
+// =========================================================
+//
+// * Product Page: https://www.creative-tim.com/product/vuetify-material-dashboard
+// * Copyright 2019 Creative Tim (https://www.creative-tim.com)
+//
+// * Coded by Creative Tim
+//
+// =========================================================
+//
+// * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+// Creative Tim refine style code
+
+@import vuetify-material/appbar
+@import vuetify-material/buttons
+@import vuetify-material/card
+
+.v-btn.v-size--default,
+.v-btn.v-size--large
+  &:not(.v-btn--icon):not(.v-btn--fab)
+    padding: 0 30px !important
+
+.theme--light.v-list-item .v-list-item__action-text,
+.theme--light.v-list-item .v-list-item__subtitle
+  color: #999
+
+.theme--light.v-text-field>.v-input__control>.v-input__slot:before
+  border-color: #d2d2d2
+
+.v-label.v-label,
+.v-alert.v-alert
+  font-size: $font-size-root
+
+.theme--light .v-main
+  background-color: #f3f3f4
+
+  
+.theme--light.v-app-bar.v-toolbar.v-sheet 
+  background-color: #272643
+
+  .v-toolbar__title
+    color: #fff
+
+.v-breadcrumbs
+  padding: 0px !important
+
+.v-card .v-card__actions
+  padding-top: 10px
+
+.v-toolbar__content
+  padding-left: 74px
+
+@media (max-width: 599px)
+  .v-toolbar__content
+    padding-left: 0px
+
+@media (min-width: 599px) and (max-width: 959px)
+  .v-toolbar__content
+    padding-left: 56px
