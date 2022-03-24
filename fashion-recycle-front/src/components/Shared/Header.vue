@@ -56,6 +56,43 @@
             </v-list-item-content>
           </v-list-item>
 
+          <!--Cadastros-->
+          <v-list-group>
+            <template v-slot:activator>
+              <v-list-item-action>
+                <v-icon color="sidebarcolor"
+                  >mdi-clipboard-check-multiple</v-icon
+                >
+              </v-list-item-action>
+
+              <v-list-item-title>Cadastros</v-list-item-title>
+            </template>
+
+            <v-list-item to="/cadastros/clientes">
+              <v-list-item-content>
+                <v-list-item-title class="wrap-text"
+                  >Cadastro Cliente</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item to="/cadastros/fornecedores">
+              <v-list-item-content>
+                <v-list-item-title class="wrap-text"
+                  >Cadastro Fornecedor</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item to="/cadastros/produtos">
+              <v-list-item-content>
+                <v-list-item-title class="wrap-text"
+                  >Cadastro Produto</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+          </v-list-group>
+
           <v-list-item to="/vendas">
             <v-list-item-action>
               <v-icon color="sidebarcolor">mdi-currency-usd </v-icon>
@@ -82,42 +119,6 @@
           <v-list-group>
             <template v-slot:activator>
               <v-list-item-action>
-                <v-icon color="sidebarcolor"
-                  >mdi-clipboard-check-multiple</v-icon
-                >
-              </v-list-item-action>
-
-              <v-list-item-title>Cadastros</v-list-item-title>
-            </template>
-
-            <v-list-item to="/teste1">
-              <v-list-item-content>
-                <v-list-item-title class="wrap-text"
-                  >Cadastro Cliente</v-list-item-title
-                >
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-list-item to="/teste2">
-              <v-list-item-content>
-                <v-list-item-title class="wrap-text"
-                  >Cadastro Fornecedor</v-list-item-title
-                >
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-list-item to="/teste3">
-              <v-list-item-content>
-                <v-list-item-title class="wrap-text"
-                  >Cadastro Produto</v-list-item-title
-                >
-              </v-list-item-content>
-            </v-list-item>
-          </v-list-group>
-          <!--Cadastros-->
-          <v-list-group>
-            <template v-slot:activator>
-              <v-list-item-action>
                 <v-icon color="sidebarcolor">mdi-chart-sankey </v-icon>
               </v-list-item-action>
 
@@ -134,7 +135,7 @@
           </v-list-group>
           <v-list-item to="/usuarios">
             <v-list-item-action>
-              <v-icon color="sidebarcolor">mdi-cog-outline  </v-icon>
+              <v-icon color="sidebarcolor">mdi-cog-outline </v-icon>
             </v-list-item-action>
 
             <v-list-item-content>

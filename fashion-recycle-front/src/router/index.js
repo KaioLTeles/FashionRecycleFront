@@ -13,6 +13,7 @@ import {
 
 // Routes
 import mainRoutes from "./main";
+import cadastrosRoutes from "./Cadastros";
 
 Vue.use(VueRouter);
 
@@ -40,6 +41,9 @@ export function getRoutes() {
   for (const route in mainRoutes) {
     routeList.push(mainRoutes[route]);
   }
+  for (const route in cadastrosRoutes) {
+    routeList.push(cadastrosRoutes[route]);
+  }
   return routeList;
 }
 
@@ -56,8 +60,8 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
-  console.log('entrou no before');
-  if (tokenValid() && to.name == "Login") {    
+  console.log("entrou no before");
+  if (tokenValid() && to.name == "Login") {
     next("/");
   }
 
@@ -70,7 +74,7 @@ router.beforeEach((to, from, next) => {
   } else {
     const usuarioLocal = localStorage.getItem("usuario");
     if (usuarioLocal) {
-      console.log("entrou usuario local")
+      console.log("entrou usuario local");
       const usuario = JSON.parse(usuarioLocal);
       store.commit(AUTENTICAR, usuario);
     } else {
