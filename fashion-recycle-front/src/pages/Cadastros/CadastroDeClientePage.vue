@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import CadastroDeCliente from "@/components/Cadastros/CadastroDeCliente.vue";
+import CadastroDeCliente from "@/components/Cadastros/Cliente/CadastroDeCliente.vue";
 
 export default {
   name: "CadastroDeClientePage",

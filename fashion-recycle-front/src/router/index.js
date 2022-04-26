@@ -14,6 +14,9 @@ import {
 // Routes
 import mainRoutes from "./main";
 import cadastrosRoutes from "./Cadastros";
+import vendasRoutes from "./Vendas";
+import pagamentosRoutes from "./Pagamentos";
+import relatorioRoutes from "./Relatorios";
 
 Vue.use(VueRouter);
 
@@ -43,6 +46,15 @@ export function getRoutes() {
   }
   for (const route in cadastrosRoutes) {
     routeList.push(cadastrosRoutes[route]);
+  }
+  for (const route in vendasRoutes) {
+    routeList.push(vendasRoutes[route]);
+  }
+  for (const route in pagamentosRoutes) {
+    routeList.push(pagamentosRoutes[route]);
+  }
+  for (const route in relatorioRoutes) {
+    routeList.push(relatorioRoutes[route]);
   }
   return routeList;
 }

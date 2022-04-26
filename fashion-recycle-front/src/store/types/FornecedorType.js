@@ -1,0 +1,13 @@
+export const BUSCARTODOSFORNECEDORES = "getListProviderAll";
+export const BUSCARFORNECEDORPORID = "getProviderById";
+export const ALTERAROUCRIARFORNECEDOR = "alterOrCreateProvider";
+export const EMPTYFORNECEDOR = "emptyFornecedor";
+export const BUSCARLISTAFORNECEDORRESUMIDA = "getAllProvidersResumeList";
+
+export default {
+  BUSCARTODOSFORNECEDORES,
+  BUSCARFORNECEDORPORID,
+  ALTERAROUCRIARFORNECEDOR,
+  EMPTYFORNECEDOR,
+  BUSCARLISTAFORNECEDORRESUMIDA,
+};

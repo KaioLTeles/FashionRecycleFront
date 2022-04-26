@@ -4,17 +4,17 @@
       <v-card color="disabledGrey" outlined> </v-card>
 
       <div class="text-center ma-2"></div>
-      <CadastroDeProdutos />
+      <RelatorioVendas />
     </v-container>
   </div>
 </template>
 
 <script>
-import CadastroDeProdutos from "@/components/Cadastros/Produto/CadastroDeProdutos";
+import RelatorioVendas from "@/components/Relatorios/RelatorioVendas.vue";
 
 export default {
-  name: "CadastroDeFornecedorPage",
-  components: { CadastroDeProdutos },
+  name: "RelatorioVendasPage",
+  components: { RelatorioVendas },
   data() {
     return {};
   },

@@ -4,17 +4,16 @@
       <v-card color="disabledGrey" outlined> </v-card>
 
       <div class="text-center ma-2"></div>
-      <CadastroDeProdutos />
+      <CadastroParceiro />
     </v-container>
   </div>
 </template>
 
 <script>
-import CadastroDeProdutos from "@/components/Cadastros/Produto/CadastroDeProdutos";
+import CadastroParceiro from "@/components/Cadastros/Parceiro/CadastroParceiro";
 
 export default {
-  name: "CadastroDeFornecedorPage",
-  components: { CadastroDeProdutos },
+  components: { CadastroParceiro },
   data() {
     return {};
   },

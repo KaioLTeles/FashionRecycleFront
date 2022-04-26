@@ -1,25 +1,29 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import vuetify from './plugins/vuetify'
-import moment from 'vue-moment'
-import { AUTENTICAR } from './store/types/UsuarioType'
+import Vue from "vue";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
+import vuetify from "./plugins/vuetify";
+import moment from "vue-moment";
+import VueMask from "v-mask";
 
-Vue.config.productionTip = false
+import { AUTENTICAR } from "./store/types/UsuarioType";
 
-Vue.use(moment)
+Vue.config.productionTip = false;
+
+Vue.use(moment);
+
+Vue.use(VueMask);
 
 new Vue({
-    router,
-    store,
-    vuetify,
-    created() {
-        const usuarioLocal = localStorage.getItem('usuario')
-        if (usuarioLocal) {
-            const usuario = JSON.parse(usuarioLocal)
-            this.$store.commit(AUTENTICAR, usuario)
-        }
-    },
-    render: h => h(App)
-}).$mount('#app')
+  router,
+  store,
+  vuetify,
+  created() {
+    const usuarioLocal = localStorage.getItem("usuario");
+    if (usuarioLocal) {
+      const usuario = JSON.parse(usuarioLocal);
+      this.$store.commit(AUTENTICAR, usuario);
+    }
+  },
+  render: (h) => h(App),
+}).$mount("#app");

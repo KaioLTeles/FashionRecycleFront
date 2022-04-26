@@ -1,0 +1,13 @@
+export const BUSCARTODOSOSPRODUTOS = "getListProductAll";
+export const BUSCARPRODUTOPORID = "getProductById";
+export const ALTERAROUCRIARPRODUTO = "alterOrCreateProduct";
+export const EMPTYPRODUTO = "emptyProduto";
+export const BUSCARPRODUTOSDISPONIVEISPARAVENDA = "getProductAllForSale";
+
+export default {
+  BUSCARTODOSOSPRODUTOS,
+  BUSCARPRODUTOPORID,
+  ALTERAROUCRIARPRODUTO,
+  EMPTYPRODUTO,
+  BUSCARPRODUTOSDISPONIVEISPARAVENDA,
+};

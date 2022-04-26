@@ -40,7 +40,7 @@
       app
       v-model="drawer"
       v-show="autenticado"
-      transitionend="true"
+      @transitionend="collapseSubItems"
     >
       <template>
         <v-divider class="mb-1" />
@@ -57,7 +57,7 @@
           </v-list-item>
 
           <!--Cadastros-->
-          <v-list-group>
+          <v-list-group v-model="cadastrosGroup">
             <template v-slot:activator>
               <v-list-item-action>
                 <v-icon color="sidebarcolor"
@@ -80,6 +80,14 @@
               <v-list-item-content>
                 <v-list-item-title class="wrap-text"
                   >Cadastro Fornecedor</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item to="/cadastros/parceiros">
+              <v-list-item-content>
+                <v-list-item-title class="wrap-text"
+                  >Cadastro Parceiro</v-list-item-title
                 >
               </v-list-item-content>
             </v-list-item>
@@ -115,8 +123,8 @@
             </v-list-item-content>
           </v-list-item>
 
-          <!--Cadastros-->
-          <v-list-group>
+          <!--Relatórios-->
+          <v-list-group v-model="relatorioGroup">
             <template v-slot:activator>
               <v-list-item-action>
                 <v-icon color="sidebarcolor">mdi-chart-sankey </v-icon>
@@ -125,10 +133,26 @@
               <v-list-item-title>Relatórios</v-list-item-title>
             </template>
 
-            <v-list-item to="/relatorio-vendas">
+            <v-list-item to="/relatorios/relatorio-vendas">
               <v-list-item-content>
                 <v-list-item-title class="wrap-text"
                   >Relatório de Vendas</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item to="/relatorios/relatorio-contas-pagar">
+              <v-list-item-content>
+                <v-list-item-title class="wrap-text"
+                  >Relatório de Contas a Pagar</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item to="/relatorios/relatorio-fluxo-caixa">
+              <v-list-item-content>
+                <v-list-item-title class="wrap-text"
+                  >Relatório de Fluxo de Caixa</v-list-item-title
                 >
               </v-list-item-content>
             </v-list-item>
@@ -190,6 +214,8 @@ export default {
       mini: true,
       dialog: false,
       isMobile: false,
+      cadastrosGroup: false,
+      relatorioGroup: false,
     };
   },
   methods: {
@@ -208,6 +234,10 @@ export default {
     },
     onResize() {
       this.isMobile = window.innerWidth < 600;
+    },
+    collapseSubItems() {
+      this.cadastrosGroup = false;
+      this.relatorioGroup = false;
     },
   },
   watch: {},
