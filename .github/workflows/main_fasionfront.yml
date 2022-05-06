@@ -22,9 +22,11 @@ jobs:
           node-version: "14.x"
 
       - name: npm install, build, and test
-        run: cd .\fashion-recycle-front\
+        run: |
+          cd .\fashion-recycle-front\;
           npm install
-          npm run build -- --mode homolog
+          npm run build --if-present
+          npm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
