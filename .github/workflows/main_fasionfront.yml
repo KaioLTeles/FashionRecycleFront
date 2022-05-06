@@ -22,7 +22,7 @@ jobs:
           node-version: "14.x"
 
       - name: npm install, build, and test
-        run: |
+        run: cd .\fashion-recycle-front\
           npm install
           npm run build -- --mode homolog
 
