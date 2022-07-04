@@ -76,18 +76,10 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item to="/cadastros/fornecedores">
-              <v-list-item-content>
-                <v-list-item-title class="wrap-text"
-                  >Cadastro Fornecedor</v-list-item-title
-                >
-              </v-list-item-content>
-            </v-list-item>
-
             <v-list-item to="/cadastros/parceiros">
               <v-list-item-content>
                 <v-list-item-title class="wrap-text"
-                  >Cadastro Parceiro</v-list-item-title
+                  >Cadastro De Fornecedor</v-list-item-title
                 >
               </v-list-item-content>
             </v-list-item>

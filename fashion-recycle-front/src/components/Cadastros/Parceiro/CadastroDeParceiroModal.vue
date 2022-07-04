@@ -3,7 +3,7 @@
     <v-dialog v-model="show" persistent max-width="800px">
       <v-card>
         <v-card-title class="justify-center">
-          Cadastro de Parceiro
+          Cadastro de Fornecedor
           <v-spacer />
           <v-icon medium @click.stop="fechar"> mdi-close </v-icon>
         </v-card-title>
@@ -13,7 +13,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    label="Código Parceiro"
+                    label="Código Fornecedor"
                     v-model="codigoForm"
                     disabled
                     clearable
@@ -49,14 +49,6 @@
                     label="CPF*"
                     v-model="cpfForm"
                     v-mask="'###.###.###-##'"
-                    clearable
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <v-text-field
-                    label="CNPJ"
-                    v-model="cnpjForm"
-                    v-mask="'##.###.###/####-##'"
                     clearable
                   ></v-text-field>
                 </v-col>
@@ -164,7 +156,12 @@ export default {
     },
     gravarParceiro() {
       const payload = {
-        id: parseInt(this.codigoForm),
+        id:
+          this.codigoForm == "" ||
+          this.codigoForm == null ||
+          this.codigoForm == undefined
+            ? 0
+            : parseInt(this.codigoForm),
         name: this.nomeForm,
         phoneNumber: this.telefoneForm
           .replace("(", "")
@@ -173,17 +170,12 @@ export default {
           .replace(" ", ""),
         email: this.emailForm,
         cpf:
-          this.cpfForm == ""
+          this.cpfForm == "" ||
+          this.cpfForm == null ||
+          this.cpfForm == undefined
             ? ""
             : this.cpfForm.replace(".", "").replace(".", "").replace("-", ""),
-        cnpj:
-          this.cnpjForm == ""
-            ? ""
-            : this.cnpjForm
-                .replace(".", "")
-                .replace(".", "")
-                .replace("-", "")
-                .replace("/", ""),
+        cnpj: "",
         address: this.enderecoForm,
         streetNumber: this.numeroForm,
         cep: this.cepForm == "" ? "" : this.cepForm.replace("-", ""),
@@ -249,7 +241,6 @@ export default {
       this.emailForm = this.ParceiroSelecionado.email;
       this.telefoneForm = this.ParceiroSelecionado.phoneNumber;
       this.cpfForm = this.ParceiroSelecionado.cpf;
-      this.cnpjForm = this.ParceiroSelecionado.cnpj;
       this.enderecoForm = this.ParceiroSelecionado.address;
       this.numeroForm = this.ParceiroSelecionado.streetNumber;
       this.cepForm = this.ParceiroSelecionado.cep;
@@ -261,7 +252,6 @@ export default {
       this.emailForm = "";
       this.telefoneForm = "";
       this.cpfForm = "";
-      this.cnpjForm = "";
       this.enderecoForm = "";
       this.numeroForm = "";
       this.cepForm = "";

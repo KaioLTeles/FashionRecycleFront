@@ -7,38 +7,57 @@
       <v-divider></v-divider>
       <v-card-text>
         <v-row>
-          <v-col>
-            <v-text-field
-              dense
-              v-model="codigoFilter"
-              type="number"
-              label="Codigo Pagamento"
-              clearable
-            ></v-text-field>
+          <v-col cols="6">
+            <v-menu
+              v-model="dateInicial.initialMenuDate"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  dense
+                  v-model="initialDateFormatted"
+                  label="Data Inicial"
+                  prepend-icon="fa-calendar-alt"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="dateInicial.initialDate"
+                @input="dateInicial.initialMenuDate = false"
+              ></v-date-picker>
+            </v-menu>
           </v-col>
-          <v-col>
-            <v-autocomplete
-              dense
-              label="Parceiro"
-              :items="listaParceirosResumida"
-              item-value="id"
-              item-text="name"
-              v-model="parceiroFilter"
-              clearable
-              :loading="loadingParceiros"
-            ></v-autocomplete>
-          </v-col>
-          <v-col>
-            <v-autocomplete
-              dense
-              label="Fornecedor"
-              :items="listaParceirosResumida"
-              item-value="id"
-              item-text="name"
-              v-model="fornecedorFilter"
-              clearable
-              :loading="loadingFornecedor"
-            ></v-autocomplete>
+          <v-col cols="6">
+            <v-menu
+              v-model="dateFinal.initialMenuDate"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  dense
+                  v-model="finalDateFormatted"
+                  label="Data Final"
+                  prepend-icon="fa-calendar-alt"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="dateFinal.initialDate"
+                @input="dateFinal.initialMenuDate = false"
+              ></v-date-picker>
+            </v-menu>
           </v-col>
         </v-row>
         <v-card-actions>
@@ -50,7 +69,7 @@
     <v-card>
       <v-card-actions>
         <v-col class="text-right">
-          <v-btn @click="criarCliente()" dark color="btnPrimary">Novo</v-btn>
+          <v-btn @click="criarPagamento()" dark color="btnPrimary">Novo</v-btn>
         </v-col>
       </v-card-actions>
 
@@ -58,10 +77,11 @@
         <v-data-table
           :headers="headers"
           item-key="codigo"
+          :items="listpayments"
           :loading="loadingDataTable"
         >
           <template v-slot:[`item.action`]="{ item }">
-            <v-icon color="btnPrimary" @click.stop="alterCliente(item)"
+            <v-icon color="btnPrimary" @click.stop="alterarPagamento(item)"
               >mdi-pencil</v-icon
             >
           </template>
@@ -85,7 +105,7 @@
 <script>
 import CadastrarPagamentoModal from "./CadastrarPagamentoModal";
 
-import { BUSCARLISTAPARCEIRORESUMIDA } from "@/store/types/ParceiroType";
+import { BUSCARTODOSPAGAMENTOSATIVOS } from "@/store/types/PagamentosType";
 
 import { SET_MESSAGE } from "@/store/types/NotificationType";
 
@@ -95,11 +115,10 @@ export default {
     return {
       headers: [
         { text: "Código", value: "id" },
-        { text: "Fornecedor", value: "name" },
-        { text: "Parceiro", value: "email" },
-        { text: "Classificação", value: "phoneNumber" },
-        { text: "Valor", value: "cpf" },
-        { text: "Data Vencimento", value: "active" },
+        { text: "Histórico", value: "name" },
+        { text: "Classificação", value: "paymenyType.description" },
+        { text: "Valor", value: "amount" },
+        { text: "Data Vencimento", value: "paymentDateFormated" },
         { text: "Ações", value: "action", sortable: false },
       ],
       codigoFilter: "",
@@ -110,27 +129,29 @@ export default {
       codigoPagamento: 0,
       loadingParceiros: false,
       loadingFornecedor: false,
+      dateInicial: {
+        todayDate: new Date().toISOString().substr(0, 10),
+        initialMenuDate: false,
+        initialDate: new Date().toISOString().substr(0, 10),
+      },
+      dateFinal: {
+        todayDate: new Date().toISOString().substr(0, 10),
+        initialMenuDate: false,
+        initialDate: new Date().toISOString().substr(0, 10),
+      },
     };
   },
   methods: {
-    criarCliente() {
+    criarPagamento() {
       this.codigoPagamento = 0;
       this.mostrarJanela = true;
     },
-    alterCliente(item) {
+    alterarPagamento(item) {
       this.codigoPagamento = item.id;
       this.mostrarJanela = true;
     },
     pesquisar() {
-      let payload = {
-        idClient: parseInt(this.codigoClienteFilter),
-        nameClient: this.nomeClienteFilter,
-        cpfClient: this.cpfClienteFilter,
-      };
-
-      this.loadingDataTable = true;
-
-      this.buscarDadosClientes(payload);
+      this.buscarListaDePagamentos();
     },
     alertaParaUsuario(payload) {
       this.$store.commit(SET_MESSAGE, payload);
@@ -138,31 +159,64 @@ export default {
     resetarCodigoPayment() {
       this.codigoPagamento = 0;
     },
-    async buscarListaDeParceiros() {
-      this.loadingParceiros = true;
+    async buscarListaDePagamentos() {
+      let payload = {
+        inicialDate: this.dateInicial.initialDate,
+        finalDate: this.dateFinal.initialDate,
+      };
+
+      this.loadingDataTable = true;
       await this.$store
-        .dispatch(BUSCARLISTAPARCEIRORESUMIDA)
+        .dispatch(BUSCARTODOSPAGAMENTOSATIVOS, payload)
         .then(() => {
-          this.loadingParceiros = false;
+          this.loadingDataTable = false;
         })
         .catch((error) => {
           if (error) {
-            this.loadingParceiros = false;
+            this.loadingDataTable = false;
             let payload = {
-              message: "Ocorreu um erro ao carregar a lista de parceiros",
+              message: "Ocorreu um erro ao carregar a lista de pagamentos",
               color: "error",
             };
             this.alertaParaUsuario(payload);
           }
         });
     },
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
+    parseDate(date) {
+      if (!date) return null;
+
+      const [day, month, year] = date.split("/");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    },
   },
-  created() {
-    this.buscarListaDeParceiros();
-  },
+  created() {},
   computed: {
-    listaParceirosResumida() {
-      return this.$store.state.ParceiroStore.listaParceiroResumida;
+    initialDateFormatted: {
+      get: function () {
+        return this.formatDate(this.dateInicial.initialDate);
+      },
+      // setter
+      set: function (newValue) {
+        this.dateInicial.initialDate = newValue;
+      },
+    },
+    finalDateFormatted: {
+      get: function () {
+        return this.formatDate(this.dateFinal.initialDate);
+      },
+      // setter
+      set: function (newValue) {
+        this.dateFinal.initialDate = newValue;
+      },
+    },
+    listpayments() {
+      return this.$store.state.PagamentosStore.listPagamentos;
     },
   },
 };

@@ -13,37 +13,10 @@
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    label="Código Pagamento"
-                    v-model="codigoForm"
-                    disabled
+                    label="Histórico"
+                    v-model="historicoForm"
                     clearable
                   ></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <v-autocomplete
-                    dense
-                    label="Parceiro"
-                    :items="listaParceirosResumida"
-                    item-value="id"
-                    item-text="name"
-                    v-model="parceiroForm"
-                    clearable
-                    :loading="loadingParceiros"
-                    return-object
-                  ></v-autocomplete>
-                </v-col>
-                <v-col cols="12">
-                  <v-autocomplete
-                    dense
-                    label="Fornecedor"
-                    :items="listaForncedoresResumida"
-                    item-value="id"
-                    item-text="legalCompanyName"
-                    v-model="fornecedorForm"
-                    clearable
-                    return-object
-                    :loading="loadingFornecedor"
-                  ></v-autocomplete>
                 </v-col>
                 <v-col cols="12">
                   <v-autocomplete
@@ -52,9 +25,8 @@
                     :items="listaDeDespesas"
                     item-value="Codigo"
                     item-text="Descricao"
-                    v-model="fornecedorForm"
+                    v-model="tipoDespesaForm"
                     clearable
-                    return-object
                     :loading="loadingFornecedor"
                   ></v-autocomplete>
                 </v-col>
@@ -92,9 +64,6 @@
                     ></v-date-picker>
                   </v-menu>
                 </v-col>
-                <v-col cols="12">
-                  <v-checkbox v-model="ativoForm" label="Ativo" />
-                </v-col>
               </v-row>
             </v-form>
           </v-container>
@@ -103,23 +72,27 @@
           <v-spacer />
           <v-btn color="info" outlined @click.stop="fechar"> Cancelar </v-btn>
           <v-btn @click="salvar()" dark color="btnPrimary">Salvar</v-btn>
+          <v-btn @click="remover()" dark color="error">Remover</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
   </v-row>
 </template>
 <script>
-import { BUSCARLISTAPARCEIRORESUMIDA } from "@/store/types/ParceiroType";
-import { BUSCARLISTAFORNECEDORRESUMIDA } from "@/store/types/FornecedorType";
-
 import { SET_MESSAGE } from "@/store/types/NotificationType";
 
+import {
+  CRIAROUALTERARPAGAMENTO,
+  BUSCARPAGAMENTOPORID,
+  REMOVERPAGAMENTO,
+} from "@/store/types/PagamentosType";
+
 export default {
-  props: ["value", "codigoCliente"],
+  props: ["value", "codigoPagamento"],
   data() {
     return {
       valid: false,
-      codigoForm: "",
+      codigoForm: 0,
       parceiroForm: null,
       fornecedorForm: null,
       valorForm: 0,
@@ -131,11 +104,14 @@ export default {
         initialMenuDate: false,
         initialDate: new Date().toISOString().substr(0, 10),
       },
+      historicoForm: "",
+      tipoDespesaForm: 0,
     };
   },
   computed: {
     show: {
       get() {
+        this.buscarPagamento();
         return this.value;
       },
       set(value) {
@@ -159,32 +135,56 @@ export default {
     },
     listaDeDespesas() {
       let array = [
-        { Codigo: 1, Descricao: "Despesa com Marketing" },
-        { Codigo: 2, Descricao: "Despesa com Aluguel" },
-        { Codigo: 3, Descricao: "Despesa com Energia Elétrica" },
-        { Codigo: 4, Descricao: "Despesa com Materiais de Escritório" },
-        { Codigo: 5, Descricao: "Despesa com Funcionários" },
-        { Codigo: 6, Descricao: "Despesa com Material de Embalagem" },
-        { Codigo: 7, Descricao: "Despesa com Assessoria Jurídica" },
-        { Codigo: 8, Descricao: "Receita com Vendas (Comissões)" },
+        { Codigo: 1, Descricao: "Custo com Comissão de Venda" },
+        { Codigo: 2, Descricao: "Custo com Material de Embalagem" },
+        { Codigo: 3, Descricao: "Custo Mercadoria Vendida" },
+        { Codigo: 4, Descricao: "Despesa com Aluguel" },
+        { Codigo: 5, Descricao: "Despesa com Assessoria Contábil" },
+        { Codigo: 6, Descricao: "Despesa com Assessoria Jurídica" },
+        { Codigo: 7, Descricao: "Despesa com Energia Elétrica" },
+        { Codigo: 8, Descricao: "Despesa com Funcionários" },
+        { Codigo: 9, Descricao: "Despesa com Marketing" },
+        { Codigo: 10, Descricao: "Despesa com Materiais de Escritório" },
+        { Codigo: 11, Descricao: "Despesa com Limpeza e Conservação" },
+        { Codigo: 12, Descricao: "Receita com Vendas (Comissões)" },
       ];
       return array;
     },
+    pagamentoSelecionado() {
+      return this.$store.state.PagamentosStore.pagamentoObj;
+    },
   },
-  created() {
-    this.buscarListaDeParceiros();
-    this.buscarListaDeFornecedores();
-  },
+  created() {},
   methods: {
+    remover() {
+      let payload = this.codigoPagamento;
+
+      this.$store
+        .dispatch(REMOVERPAGAMENTO, payload)
+        .then(() => {
+          this.loadingParceiros = false;
+          let payload = {
+            message: "Pagamento removido com sucesso!",
+            color: "success",
+          };
+          this.alertaParaUsuario(payload);
+          this.fechar();
+        })
+        .catch((error) => {
+          if (error) {
+            this.loadingParceiros = false;
+            let payload = {
+              message: "Ocorreu um erro ao remover pagamento",
+              color: "error",
+            };
+            this.alertaParaUsuario(payload);
+          }
+        });
+    },
     salvar() {
-      if (
-        (this.parceiroForm != null && this.fornecedorForm != null) ||
-        this.fornecedorForm != undefined ||
-        this.parceiroForm != undefined
-      ) {
+      if (this.valorForm == 0) {
         let payload = {
-          message:
-            "Um pagamento não pode ter um fornecedor e um parceiro selecionado!",
+          message: "Um pagamento não pode ter um valor de pagamento zerado!",
           color: "warning",
         };
         this.alertaParaUsuario(payload);
@@ -193,7 +193,57 @@ export default {
       }
     },
     gravarPagamento() {
-      return;
+      let payload = {
+        id: this.codigoForm,
+        name: this.historicoForm,
+        idPaymentType: this.tipoDespesaForm,
+        amount: this.valorForm,
+        paymentDate: this.date.initialDate,
+      };
+
+      this.$store
+        .dispatch(CRIAROUALTERARPAGAMENTO, payload)
+        .then(() => {
+          this.loadingParceiros = false;
+          let payload = {
+            message: "Pagamento cadastrado/alterado com sucesso!",
+            color: "success",
+          };
+          this.alertaParaUsuario(payload);
+          this.fechar();
+        })
+        .catch((error) => {
+          if (error) {
+            this.loadingParceiros = false;
+            let payload = {
+              message: "Ocorreu um erro ao carregar a lista de parceiros",
+              color: "error",
+            };
+            this.alertaParaUsuario(payload);
+          }
+        });
+    },
+    async buscarPagamento() {
+      if (this.codigoPagamento != 0) {
+        let payload = {
+          idPayment: this.codigoPagamento,
+        };
+
+        await this.$store
+          .dispatch(BUSCARPAGAMENTOPORID, payload)
+          .then(() => {
+            this.carregarDadosForm();
+          })
+          .catch((error) => {
+            if (error) {
+              let payload = {
+                message: "Ocorreu um erro ao carregar os dados do pagamento",
+                color: "error",
+              };
+              this.alertaParaUsuario(payload);
+            }
+          });
+      }
     },
     fechar() {
       this.$emit("resetarCodigoPayment");
@@ -208,42 +258,16 @@ export default {
       this.fornecedorForm = 0;
       this.valorForm = 0;
       this.ativoForm = false;
+      this.historicoForm = "";
     },
-    async buscarListaDeParceiros() {
-      this.loadingParceiros = true;
-      await this.$store
-        .dispatch(BUSCARLISTAPARCEIRORESUMIDA)
-        .then(() => {
-          this.loadingParceiros = false;
-        })
-        .catch((error) => {
-          if (error) {
-            this.loadingParceiros = false;
-            let payload = {
-              message: "Ocorreu um erro ao carregar a lista de parceiros",
-              color: "error",
-            };
-            this.alertaParaUsuario(payload);
-          }
-        });
-    },
-    async buscarListaDeFornecedores() {
-      this.loadingFornecedor = true;
-      await this.$store
-        .dispatch(BUSCARLISTAFORNECEDORRESUMIDA)
-        .then(() => {
-          this.loadingFornecedor = false;
-        })
-        .catch((error) => {
-          if (error) {
-            this.loadingFornecedor = false;
-            let payload = {
-              message: "Ocorreu um erro ao carregar a lista de fornecedores",
-              color: "error",
-            };
-            this.alertaParaUsuario(payload);
-          }
-        });
+    carregarDadosForm() {
+      this.codigoForm = this.pagamentoSelecionado.id;
+      this.valorForm = this.pagamentoSelecionado.amount;
+      this.historicoForm = this.pagamentoSelecionado.name;
+      this.tipoDespesaForm = this.pagamentoSelecionado.paymenyType.id;
+      this.data.initialDate = Date(
+        this.pagamentoSelecionado.paymentDateFormated
+      );
     },
     alertaParaUsuario(payload) {
       this.$store.commit(SET_MESSAGE, payload);
@@ -261,18 +285,7 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
   },
-  watch: {
-    parceiroForm(newValue) {
-      if (newValue != null || newValue != undefined || newValue != 0) {
-        this.fornecedorForm = null;
-      }
-    },
-    fornecedorForm(newValue) {
-      if (newValue != null || newValue != undefined || newValue != 0) {
-        this.parceiroForm = null;
-      }
-    },
-  },
+  watch: {},
 };
 </script>
 

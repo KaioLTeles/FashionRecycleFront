@@ -164,7 +164,12 @@ export default {
     },
     gravarFornecedor() {
       const payload = {
-        id: parseInt(this.codigoForm),
+        id:
+          this.codigoForm == "" ||
+          this.codigoForm == null ||
+          this.codigoForm == undefined
+            ? 0
+            : parseInt(this.codigoForm),
         companyName: this.fantasiaForm,
         legalCompanyName: this.razaoForm,
         phoneNumber:

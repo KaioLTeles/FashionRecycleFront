@@ -4,8 +4,7 @@ const BuscarTodosOsProdutos = async function (payload) {
   return API.get("/product/getListProductAll", {
     params: {
       id: payload.id,
-      name: payload.name,
-      brand: payload.brand,
+      idBrand: payload.brand,
       idPartner: payload.idPartner,
     },
   });
@@ -23,12 +22,17 @@ const AlterarOuCriarProduto = async function (payload) {
   return API.post("/product/alterOrCreateProduct", {
     id: payload.id,
     name: payload.name,
-    brand: payload.brand,
     amountInventory: payload.amountInventory,
     pricePartner: payload.pricePartner,
     priceSale: payload.priceSale,
     partnerId: payload.partnerId,
     active: payload.active,
+    productStatus: payload.productStatus,
+    serialNumber: payload.serialNumber,
+    model: payload.model,
+    colour: payload.colour,
+    observation: payload.observation,
+    brandId: payload.brandId,
   });
 };
 

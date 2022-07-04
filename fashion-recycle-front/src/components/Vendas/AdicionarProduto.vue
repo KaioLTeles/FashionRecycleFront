@@ -25,14 +25,6 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="Quantidade"
-                    v-model="quantidadeForm"
-                    type="number"
-                    clearable
-                  ></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <v-text-field
                     label="Preço Unitário"
                     v-model="precoVendaForm"
                     clearable
@@ -66,7 +58,7 @@ export default {
       valid: false,
       produtoForm: null,
       precoVendaForm: 0,
-      quantidadeForm: 0,
+      quantidadeForm: 1,
     };
   },
   computed: {
@@ -109,44 +101,18 @@ export default {
       }
 
       if (
-        this.quantidadeForm == null ||
-        this.quantidadeForm == undefined ||
-        this.quantidadeForm == 0
-      ) {
-        let payload = {
-          message: "Quantidade não pode ser zero!",
-          color: "warning",
-        };
-        this.alertaParaUsuario(payload);
-        return;
-      }
-
-      if (
         this.precoVendaForm == null ||
         this.precoVendaForm == undefined ||
         this.precoVendaForm == 0
       ) {
         let payload = {
-          message: "Favor digitar o preço unitário do produto!",
+          message: "Favor digitar o preço do produto!",
           color: "warning",
         };
         this.alertaParaUsuario(payload);
         return;
       }
 
-      if (
-        parseInt(this.quantidadeForm) >
-        parseInt(this.produtoForm.amountInventory)
-      ) {
-        console.log("Entrou no if");
-        let payload = {
-          message:
-            "A quantidade do produto definida é maior que o estoque disponivel!",
-          color: "warning",
-        };
-        this.alertaParaUsuario(payload);
-        return;
-      }
       if (
         produtoJaInseridoNalista != null ||
         produtoJaInseridoNalista != undefined
@@ -166,7 +132,7 @@ export default {
         idParceiro: this.produtoForm.partner.id,
         nomeParceiro: this.produtoForm.partner.name,
         precoDevenda: this.precoVendaForm,
-        quantidade: this.quantidadeForm,
+        quantidade: 1,
       };
       this.adiconarProdutoALista(payloadProduto);
     },

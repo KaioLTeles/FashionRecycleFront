@@ -21,32 +21,54 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="Descrição*"
+                    label="Item*"
                     v-model="nomeForm"
-                    :rules="nomeRule"
                     clearable
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="Marca*"
-                    v-model="marcaForm"
-                    :rules="marcaRule"
+                    label="Modelo*"
+                    v-model="modeloForm"
                     clearable
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="Quantidade Estoque*"
-                    v-model="estoqueForm"
-                    type="number"
+                    label="Número de Série*"
+                    v-model="serieForm"
+                    clearable
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
+                    label="Cor*"
+                    v-model="corForm"
                     clearable
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-autocomplete
                     dense
-                    label="Parceiro"
+                    label="Marca"
+                    :items="listaMarcas"
+                    item-value="id"
+                    item-text="name"
+                    v-model="marcaForm"
+                    clearable
+                    :loading="loadingParceiros"
+                  ></v-autocomplete>
+                </v-col>
+                <v-col cols="12">
+                  <v-textarea
+                    label="Situação Do Produto*"
+                    v-model="situacaoForm"
+                  ></v-textarea>
+                </v-col>
+                <v-col cols="12">
+                  <v-autocomplete
+                    dense
+                    label="Fornecedor"
                     :items="listaParceirosResumida"
                     item-value="id"
                     item-text="name"
@@ -56,9 +78,20 @@
                   ></v-autocomplete>
                 </v-col>
                 <v-col cols="12">
+                  <v-select
+                    dense
+                    label="Status"
+                    :items="listStatus"
+                    item-value="id"
+                    item-text="name"
+                    v-model="statusForm"
+                  ></v-select>
+                </v-col>
+                <v-col cols="12">
                   <v-text-field
                     label="Preço Parceiro*"
                     v-model="precoParceiroForm"
+                    type="number"
                     clearable
                   ></v-text-field>
                 </v-col>
@@ -66,6 +99,7 @@
                   <v-text-field
                     label="Preço Venda*"
                     v-model="precoVendaForm"
+                    type="number"
                     clearable
                   ></v-text-field>
                 </v-col>
@@ -95,23 +129,29 @@ import {
 
 import { BUSCARLISTAPARCEIRORESUMIDA } from "@/store/types/ParceiroType";
 
+import { BUSCARMARGEMPADRAO } from "@/store/types/PagamentosType";
+
 import { SET_MESSAGE } from "@/store/types/NotificationType";
 
 export default {
   props: ["value", "codigoProduto"],
   data() {
     return {
-      nomeRule: [(v) => !!v || "Descrição é Obrigatório"],
-      marcaRule: [(v) => !!v || "Marca é Obrigatório"],
       valid: false,
       codigoForm: "0",
       ativoForm: false,
       precoVendaForm: 0.0,
       precoParceiroForm: 0.0,
-      parceiroForm: null,
+      parceiroForm: 0,
       estoqueForm: 0,
-      marcaForm: "",
+      marcaForm: 0,
       nomeForm: "",
+      statusForm: 0,
+      situacaoForm: 0,
+      corForm: "",
+      serieForm: "",
+      modeloForm: "",
+      idBanco: 0,
     };
   },
   computed: {
@@ -130,11 +170,37 @@ export default {
     listaParceirosResumida() {
       return this.$store.state.ParceiroStore.listaParceiroResumida;
     },
+    listaMarcas() {
+      return this.$store.state.MarcaStore.marcaList;
+    },
+    margem() {
+      return this.$store.state.PagamentosStore.margemPadrao;
+    },
+    listStatus() {
+      let array = [
+        { id: 1, name: "Disponivel" },
+        { id: 2, name: "Vendido" },
+        { id: 3, name: "Devolvido" },
+      ];
+      return array;
+    },
   },
   created() {
     this.buscarListaDeParceiros();
+    this.buscarMargemPadrao();
   },
   methods: {
+    async buscarMargemPadrao() {
+      await this.$store.dispatch(BUSCARMARGEMPADRAO).catch((error) => {
+        if (error) {
+          let payload = {
+            message: "Ocorreu um erro ao buscar a margem padrão",
+            color: "error",
+          };
+          this.alertaParaUsuario(payload);
+        }
+      });
+    },
     fechar() {
       this.$emit("resetarCodigoProduto");
       this.$store.commit(EMPTYPRODUTO);
@@ -144,13 +210,16 @@ export default {
       this.show = !this.show;
     },
     salvar() {
-      if (
-        this.$refs.form.validate() &&
-        this.precoVendaForm > 0.0 &&
-        this.precoParceiroForm > 0.0 &&
-        this.estoqueForm > 0
-      ) {
-        this.gravarProduto();
+      if (this.precoVendaForm > 0.0 && this.precoParceiroForm > 0.0) {
+        if (this.precoParceiroForm > this.precoVendaForm) {
+          let payload = {
+            message: "O preço do parceiro não pode ser maior que o de venda!",
+            color: "warning",
+          };
+          this.alertaParaUsuario(payload);
+        } else {
+          this.gravarProduto();
+        }
       } else {
         let payload = {
           message: "Favor preencher todos os campos Obrigatórios!",
@@ -160,15 +229,25 @@ export default {
       }
     },
     gravarProduto() {
-      const payload = {
-        id: parseInt(this.codigoForm),
+      let payload = {
+        id:
+          this.idBanco == "" ||
+          this.idBanco == null ||
+          this.idBanco == undefined
+            ? 0
+            : parseInt(this.idBanco),
         name: this.nomeForm,
-        brand: this.marcaForm,
-        amountInventory: this.estoqueForm,
-        pricePartner: this.precoVendaForm,
-        priceSale: this.precoVendaForm,
+        amountInventory: 1,
+        pricePartner: parseFloat(this.precoParceiroForm),
+        priceSale: parseFloat(this.precoVendaForm),
         partnerId: this.parceiroForm,
         active: this.ativoForm,
+        productStatus: this.statusForm,
+        serialNumber: this.serieForm,
+        model: this.modeloForm,
+        colour: this.corForm,
+        observation: this.situacaoForm,
+        brandId: this.marcaForm,
       };
       this.$store
         .dispatch(ALTERAROUCRIARPRODUTO, payload)
@@ -244,24 +323,40 @@ export default {
         });
     },
     carregarDadosForm() {
-      this.codigoForm = this.produtoSelecionado.id;
+      this.codigoForm = this.produtoSelecionado.alternativeId;
+      this.idBanco = this.produtoSelecionado.id;
       this.nomeForm = this.produtoSelecionado.name;
       this.marcaForm = this.produtoSelecionado.brand;
-      this.estoqueForm = this.produtoSelecionado.amountInventory;
-      this.parceiroForm = this.produtoSelecionado.PartnerId;
+      this.parceiroForm = this.produtoSelecionado.partnerId;
       this.precoParceiroForm = this.produtoSelecionado.pricePartner;
       this.precoVendaForm = this.produtoSelecionado.priceSale;
       this.ativoForm = this.produtoSelecionado.active;
+      this.marcaForm = this.produtoSelecionado.brandId;
+      this.statusForm = this.produtoSelecionado.productStatus;
+      this.situacaoForm = this.produtoSelecionado.observation;
+      this.corForm = this.produtoSelecionado.colour;
+      this.serieForm = this.produtoSelecionado.serialNumber;
+      this.modeloForm = this.produtoSelecionado.model;
     },
     limparCamposForm() {
       this.codigoForm = "0";
       this.nomeForm = "";
       this.marcaForm = "";
-      this.estoqueForm = 0;
       this.parceiroForm = 0.0;
       this.precoParceiroForm = 0.0;
       this.precoVendaForm = 0.0;
       this.ativoForm = false;
+      this.marcaForm = 0;
+      this.statusForm = 0;
+      this.situacaoForm = "";
+      this.corForm = "";
+      this.serieForm = "";
+      this.modeloForm = "";
+    },
+  },
+  watch: {
+    precoParceiroForm() {
+      this.precoVendaForm = this.precoParceiroForm * this.margem;
     },
   },
 };

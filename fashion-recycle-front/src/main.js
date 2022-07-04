@@ -5,12 +5,15 @@ import store from "./store";
 import vuetify from "./plugins/vuetify";
 import moment from "vue-moment";
 import VueMask from "v-mask";
+import VueExcelXlsx from "vue-excel-xlsx";
 
 import { AUTENTICAR } from "./store/types/UsuarioType";
 
 Vue.config.productionTip = false;
 
 Vue.use(moment);
+
+Vue.use(VueExcelXlsx);
 
 Vue.use(VueMask);
 

@@ -19,6 +19,7 @@ const BuscarClientePeloId = async function (payload) {
 };
 
 const AlterarOuCriarCliente = async function (payload) {
+  console.log(payload);
   return API.post("/client/alterOrCreateClient", {
     id: payload.id,
     name: payload.name,

@@ -150,7 +150,12 @@ export default {
     },
     gravarCliente() {
       const payload = {
-        id: parseInt(this.codigoForm),
+        id:
+          this.codigoForm == "" ||
+          this.codigoForm == null ||
+          this.codigoForm == undefined
+            ? 0
+            : parseInt(this.codigoForm),
         name: this.nomeForm,
         phoneNumber: this.telefoneForm
           .replace("(", "")

@@ -7,6 +7,9 @@ import ParceiroStore from "./modules/ParceiroStore";
 import FornecedorStore from "./modules/FornecedorStore";
 import ProdutoStore from "./modules/ProdutoStore";
 import VendasStore from "./modules/VendasStore";
+import MarcaStore from "./modules/MarcaStore";
+import PagamentosStore from "./modules/PagamentosStore";
+import RelatorioStore from "./modules/RelatorioStore";
 
 Vue.use(Vuex);
 
@@ -19,5 +22,8 @@ export default new Vuex.Store({
     FornecedorStore,
     ProdutoStore,
     VendasStore,
+    MarcaStore,
+    PagamentosStore,
+    RelatorioStore,
   },
 });

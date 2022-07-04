@@ -16,6 +16,7 @@
               item-text="name"
               v-model="clienteFilter"
               clearable
+              return-object
               :loading="loadingCampoCliente"
             ></v-autocomplete>
           </v-col>
@@ -26,6 +27,7 @@
               :items="formasPagamento"
               item-value="Codigo"
               item-text="Descricao"
+              return-object
               v-model="formaPagamentoFilter"
               clearable
             ></v-autocomplete>
@@ -113,14 +115,105 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="info" @click="fecharModalResult()">OK</v-btn>
+          <v-btn color="info" @click="imprimirRecibo()">Imprimir Recibo</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <div>
+      <vue-html2pdf
+        :show-layout="false"
+        :float-layout="true"
+        :enable-download="true"
+        :preview-modal="false"
+        :paginate-elements-by-height="1400"
+        filename="Recibo_Compra_Fashion_Recycle"
+        :pdf-quality="2"
+        :manual-pagination="false"
+        pdf-format="a4"
+        pdf-orientation="portrait"
+        pdf-content-width="800px"
+        ref="html2Pdf"
+      >
+        <section slot="pdf-content">
+          <section
+            class="pdf-item"
+            style="
+              text-align: center;
+              margin-top: 25px;
+              border: 1px solid black;
+              border-collapse: collapse;
+            "
+          >
+            <h4>FASHION RECYCLE</h4>
+          </section>
+          <section class="pdf-item" style="margin-top: 5px">
+            <table style="width: 98%; margin-left: 5px">
+              <tbody>
+                <tr>
+                  <td>PEDIDO DE VENDA Nº {{ codigoVendaCriado }}</td>
+                </tr>
+                <tr>
+                  <td>CLIENTE: {{ clienteFilter.name }}</td>
+                </tr>
+                <tr>
+                  <td>
+                    FORMA DE PAGAMENTO: {{ formaPagamentoFilter.Descricao }}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    VALOR TOTAL DO PEDIDO R$:
+                    {{
+                      valorDoPedido.toLocaleString("pt-br", {
+                        minimumFractionDigits: 2,
+                      })
+                    }}
+                  </td>
+                </tr>
+                <tr>
+                  <td>DATA DO PEDIDO: {{ today.toLocaleDateString() }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+          <section class="pdf-item" style="margin-top: 5px; width: 100%">
+            <table style="width: 98%; margin-left: 5px">
+              <thead>
+                <tr>
+                  <th>Qnt</th>
+                  <th>Produto</th>
+                  <th>Preço</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in itemsVenda" :key="item.sequencia">
+                  <td>
+                    {{ item.quantidade == undefined ? 0 : item.quantidade }}
+                  </td>
+                  <td>
+                    {{
+                      item.descricaoProduto == undefined
+                        ? 0
+                        : item.descricaoProduto
+                    }}
+                  </td>
+                  <td>
+                    {{ item.precoDevenda == undefined ? 0 : item.precoDevenda }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </section>
+      </vue-html2pdf>
+    </div>
   </div>
 </template>
 
 <script>
 import AdicionarProduto from "./AdicionarProduto";
+import VueHtml2pdf from "vue-html2pdf";
 
 import { BUSCARLISTACLIENTERESUMIDA } from "@/store/types/ClienteType";
 
@@ -133,7 +226,7 @@ import {
 import { SET_MESSAGE } from "@/store/types/NotificationType";
 
 export default {
-  components: { AdicionarProduto },
+  components: { AdicionarProduto, VueHtml2pdf },
   data() {
     return {
       headers: [
@@ -154,9 +247,16 @@ export default {
       codigoProduto: 0,
       dialogSaving: false,
       vendaCriadaResult: false,
+      today: new Date(),
     };
   },
   methods: {
+    generateReport() {
+      this.$refs.html2Pdf.generatePdf();
+    },
+    imprimirRecibo() {
+      this.generateReport();
+    },
     adicionarProduto() {
       this.codigoProduto = 0;
       this.janelaAdicioanrProduto = true;
@@ -219,9 +319,9 @@ export default {
       } else {
         let payload = {
           sale: {
-            IdClient: this.clienteFilter,
+            IdClient: this.clienteFilter.id,
             AmountSale: this.valorDoPedido,
-            IdPaymentMethod: this.formaPagamentoFilter,
+            IdPaymentMethod: this.formaPagamentoFilter.Codigo,
             Observation: "Teste",
           },
           saleItems: [],
@@ -344,5 +444,18 @@ export default {
 .inputContainer {
   padding-top: 2px;
   padding-bottom: 0px;
+}
+table,
+th,
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 5px;
+}
+th {
+  text-align: left;
 }
 </style>

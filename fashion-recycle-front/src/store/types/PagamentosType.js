@@ -1,0 +1,13 @@
+export const BUSCARMARGEMPADRAO = "getMargin";
+export const BUSCARTODOSPAGAMENTOSATIVOS = "getListPaymentsAll";
+export const BUSCARPAGAMENTOPORID = "getPaymentById";
+export const CRIAROUALTERARPAGAMENTO = "alterOrCreatePayment";
+export const REMOVERPAGAMENTO = "removePayment";
+
+export default {
+  BUSCARMARGEMPADRAO,
+  BUSCARTODOSPAGAMENTOSATIVOS,
+  BUSCARPAGAMENTOPORID,
+  CRIAROUALTERARPAGAMENTO,
+  REMOVERPAGAMENTO,
+};

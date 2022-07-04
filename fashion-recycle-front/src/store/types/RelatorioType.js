@@ -1,0 +1,7 @@
+export const BUSCARRELATORIOVENDAS = "getReportSales";
+export const BUSCARRELATORIODEPAGAMENTOS = "getReportPayments";
+
+export default {
+  BUSCARRELATORIOVENDAS,
+  BUSCARRELATORIODEPAGAMENTOS,
+};

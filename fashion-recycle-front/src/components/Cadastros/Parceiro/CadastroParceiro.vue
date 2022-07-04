@@ -2,7 +2,7 @@
   <div>
     <v-card class="margin-bottom-1-em">
       <v-card-title>
-        <v-toolbar-title class="title">Cadastro de Parceiros</v-toolbar-title>
+        <v-toolbar-title class="title">Cadastro de Fornecedor</v-toolbar-title>
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text>
@@ -11,7 +11,7 @@
             <v-text-field
               dense
               type="number"
-              label="Codigo Parceiro"
+              label="Codigo Fornecedor"
               v-model="codigoFilter"
               clearable
             ></v-text-field>
@@ -30,15 +30,6 @@
               label="CPF"
               type="number"
               v-model="cpfFilter"
-              clearable
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              dense
-              label="CNPJ"
-              type="number"
-              v-model="cnpjFilter"
               clearable
             ></v-text-field>
           </v-col>
@@ -102,7 +93,6 @@ export default {
         { text: "Telefone", value: "phoneNumber" },
         { text: "Email", value: "email" },
         { text: "CPF", value: "cpf" },
-        { text: "CNPJ", value: "cnpj" },
         { text: "Ativo", value: "active" },
         { text: "Ações", value: "action", sortable: false },
       ],

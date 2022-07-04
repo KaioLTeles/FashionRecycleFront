@@ -7,11 +7,63 @@
       <v-divider></v-divider>
       <v-card-text>
         <v-row>
+          <v-col cols="6">
+            <v-menu
+              v-model="dateInicial.initialMenuDate"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  dense
+                  v-model="initialDateFormatted"
+                  label="Data Inicial"
+                  prepend-icon="fa-calendar-alt"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="dateInicial.initialDate"
+                @input="dateInicial.initialMenuDate = false"
+              ></v-date-picker>
+            </v-menu>
+          </v-col>
+          <v-col cols="6">
+            <v-menu
+              v-model="dateFinal.initialMenuDate"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  dense
+                  v-model="finalDateFormatted"
+                  label="Data Final"
+                  prepend-icon="fa-calendar-alt"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="dateFinal.initialDate"
+                @input="dateFinal.initialMenuDate = false"
+              ></v-date-picker>
+            </v-menu>
+          </v-col>
           <v-col>
             <v-text-field
               dense
               label="Codigo Venda"
-              v-model="marcaFilter"
+              v-model="codigoVendaFilter"
               clearable
             ></v-text-field>
           </v-col>
@@ -30,27 +82,19 @@
           <v-col>
             <v-autocomplete
               dense
-              label="Produto"
-              :items="listaProdutosParaVenda"
+              label="Marca"
+              :items="listaMarcas"
               item-value="id"
               item-text="name"
-              v-model="produtoForm"
-              clearable
-              return-object
-            ></v-autocomplete>
-          </v-col>
-          <v-col>
-            <v-text-field
-              dense
-              label="Marca"
               v-model="marcaFilter"
               clearable
-            ></v-text-field>
+              :loading="loadingCampoMarca"
+            ></v-autocomplete>
           </v-col>
           <v-col>
             <v-autocomplete
               dense
-              label="Parceiro"
+              label="Fornecedor"
               :items="listaParceirosResumida"
               item-value="id"
               item-text="name"
@@ -62,6 +106,13 @@
         </v-row>
         <v-card-actions>
           <v-btn color="btnPrimary" @click="pesquisar()"> Pesquisar </v-btn>
+          <BtnExportToXlsx
+            :dataExport="listaItensExport"
+            :columnsExport="headersXlsExport"
+            :fileName="rel_vendas_nome"
+            sheetName="Vendas"
+            :loadingToExport="loadingExport"
+          ></BtnExportToXlsx>
         </v-card-actions>
       </v-card-text>
     </v-card>
@@ -71,19 +122,13 @@
         <v-data-table
           :headers="headers"
           item-key="codigo"
-          :items="listaVendasTeste"
+          :items="listaVendas"
           :loading="loadingDataTable"
         >
           <template v-slot:[`item.action`]="{ item }">
             <v-icon color="btnPrimary" @click.stop="alterarProduto(item)"
               >mdi-clipboard-text-search</v-icon
             >
-          </template>
-          <template v-slot:[`item.ativo`]="{ item }">
-            <v-simple-checkbox
-              v-model="item.ativo"
-              disabled
-            ></v-simple-checkbox>
           </template>
         </v-data-table>
       </v-card-text>
@@ -92,70 +137,110 @@
 </template>
 
 <script>
-import {
-  BUSCARTODOSOSPRODUTOS,
-  EMPTYPRODUTO,
-  BUSCARPRODUTOSDISPONIVEISPARAVENDA,
-} from "@/store/types/ProdutoType";
+import BtnExportToXlsx from "@/components/Shared/BtnExportToXlsx";
+
+import { BUSCARPRODUTOSDISPONIVEISPARAVENDA } from "@/store/types/ProdutoType";
+
+import { BUSCARRELATORIOVENDAS } from "@/store/types/RelatorioType";
 
 import { BUSCARLISTACLIENTERESUMIDA } from "@/store/types/ClienteType";
 
 import { BUSCARLISTAPARCEIRORESUMIDA } from "@/store/types/ParceiroType";
 
+import { BUSCARTODASASMARCAS } from "@/store/types/MarcaType";
+
+import { SET_MESSAGE } from "@/store/types/NotificationType";
+
 export default {
-  components: {},
+  components: { BtnExportToXlsx },
   data() {
     return {
       headers: [
-        { text: "Código", value: "cod" },
-        { text: "Cliente", value: "cli" },
-        { text: "Total da Venda", value: "total" },
-        { text: "Forma de Pagamento", value: "pag" },
-        { text: "Ativo", value: "ativo" },
-        { text: "Data da Venda", value: "data" },
-        { text: "Ações", value: "action", sortable: false },
+        { text: "Codigo da Venda", value: "id" },
+        { text: "Data da Venda", value: "creationDateFormated" },
+        { text: "Cliente", value: "nameClient" },
+        { text: "Código Produto", value: "alternativeId" },
+        { text: "Produto", value: "productDesciption" },
+        { text: "Total da Venda", value: "amountSale" },
+        { text: "Forma de Pagamento", value: "paymentMethod" },
       ],
       mostrarJanela: false,
       loadingDataTable: false,
       loadingParceiros: false,
-      codigoFilter: "",
-      nomeFilter: "",
-      marcaFilter: "",
+      loadingCampoMarca: false,
+      loadingExport: false,
+      listaItensExport: [],
+      rel_vendas_nome: "Rel_Vendas_Export",
+      headersXlsExport: [
+        { label: "Codigo da Venda", field: "id" },
+        { label: "Data da Venda", field: "creationDateFormated" },
+        { label: "Cliente", field: "nameClient" },
+        { label: "Codigo da Venda", field: "Cliente" },
+        { label: "Código Produto", field: "alternativeId" },
+        { label: "Produto", field: "productDesciption" },
+        { label: "Total da Venda", field: "amountSale" },
+        { label: "Forma de Pagamento", field: "paymentMethod" },
+      ],
+      codigoVendaFilter: 0,
+      clienteFilter: 0,
+      marcaFilter: 0,
       parceiroFilter: 0,
       codigoProduto: 0,
       loadingCampoCliente: false,
       listaVendasTeste: [],
+      dateInicial: {
+        todayDate: new Date().toISOString().substr(0, 10),
+        initialMenuDate: false,
+        initialDate: new Date().toISOString().substr(0, 10),
+      },
+      dateFinal: {
+        todayDate: new Date().toISOString().substr(0, 10),
+        initialMenuDate: false,
+        initialDate: new Date().toISOString().substr(0, 10),
+      },
     };
   },
   methods: {
     pesquisar() {
-      this.listaVendasTeste = this.listaVendas;
+      this.buscarDadosRelatório();
     },
-    async buscarDadosProduto(payload) {
-      await this.$store
-        .dispatch(BUSCARTODOSOSPRODUTOS, payload)
+    buscarDadosRelatório() {
+      let payload = {
+        idSale:
+          this.codigoVendaFilter == null || this.codigoVendaFilter == ""
+            ? 0
+            : parseInt(this.codigoVendaFilter),
+        idClient: parseInt(this.clienteFilter),
+        idPartner: parseInt(this.parceiroFilter),
+        brand: parseInt(this.marcaFilter),
+        inicialFilterDate: this.dateInicial.initialDate,
+        finalFilterDate: this.dateFinal.initialDate,
+      };
+      this.loadingDataTable = true;
+
+      this.$store
+        .dispatch(BUSCARRELATORIOVENDAS, payload)
         .then(() => {
           this.loadingDataTable = false;
+          this.listaItensExport = this.listaVendas;
         })
         .catch((error) => {
           if (error) {
             this.loadingDataTable = false;
             let payload = {
-              message: "Ocorreu um erro ao carregar os dados de produtos",
+              message: "Ocorreu um erro ao carregar os dados de venda",
               color: "error",
             };
             this.alertaParaUsuario(payload);
           }
         });
     },
-    criarProduto() {
-      this.$store.commit(EMPTYPRODUTO);
-      this.codigoProduto = 0;
-      this.mostrarJanela = true;
-    },
     alterarProduto(item) {
       this.codigoProduto = item.id;
       this.mostrarJanela = true;
+    },
+    alertaParaUsuario(payload) {
+      this.$store.commit(SET_MESSAGE, payload);
     },
     async buscarListaDeParceiros() {
       this.loadingParceiros = true;
@@ -169,6 +254,24 @@ export default {
             this.loadingParceiros = false;
             let payload = {
               message: "Ocorreu um erro ao carregar a lista de parceiros",
+              color: "error",
+            };
+            this.alertaParaUsuario(payload);
+          }
+        });
+    },
+    async buscarMarcas() {
+      this.loadingCampoMarca = true;
+      await this.$store
+        .dispatch(BUSCARTODASASMARCAS)
+        .then(() => {
+          this.loadingCampoMarca = false;
+        })
+        .catch((error) => {
+          if (error) {
+            this.loadingCampoMarca = false;
+            let payload = {
+              message: "Ocorreu um erro ao carregar os dados de marcas",
               color: "error",
             };
             this.alertaParaUsuario(payload);
@@ -210,77 +313,54 @@ export default {
           }
         });
     },
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
+    parseDate(date) {
+      if (!date) return null;
+
+      const [day, month, year] = date.split("/");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    },
   },
   created() {
     this.buscarListaDeParceiros();
     this.carregarCampoCiente();
-    this.buscarProdutosVenda();
+    this.buscarMarcas();
   },
   computed: {
-    listaProdutos() {
-      return this.$store.state.ProdutoStore.produtoList;
-    },
     listaParceirosResumida() {
       return this.$store.state.ParceiroStore.listaParceiroResumida;
     },
     listaDeClientes() {
       return this.$store.state.ClienteStore.clientListResumida;
     },
-    listaProdutosParaVenda() {
-      return this.$store.state.ProdutoStore.produtoVendaList;
+    listaMarcas() {
+      return this.$store.state.MarcaStore.marcaList;
     },
     listaVendas() {
-      let array = [
-        {
-          cod: "38",
-          cli: "Moisa",
-          total: "1500",
-          pag: "TRANSFERÊNCIA/PIX",
-          ativo: true,
-          data: "06/04/2022",
-        },
-        {
-          cod: "39",
-          cli: "Kalhil",
-          total: "3000",
-          pag: "TRANSFERÊNCIA/PIX",
-          ativo: true,
-          data: "06/04/2022",
-        },
-        {
-          cod: "40",
-          cli: "Moisa",
-          total: "1500",
-          pag: "TRANSFERÊNCIA/PIX",
-          ativo: true,
-          data: "06/04/2022",
-        },
-        {
-          cod: "41",
-          cli: "Maneu",
-          total: "500",
-          pag: "CARTÃO CRÉDITO",
-          ativo: true,
-          data: "07/04/2022",
-        },
-        {
-          cod: "42",
-          cli: "Moisa",
-          total: "2000",
-          pag: "TRANSFERÊNCIA/PIX",
-          ativo: true,
-          data: "07/04/2022",
-        },
-        {
-          cod: "43",
-          cli: "KAIO BALÃO",
-          total: "800",
-          pag: "BOLETO",
-          ativo: true,
-          data: "07/04/2022",
-        },
-      ];
-      return array;
+      return this.$store.state.RelatorioStore.relVendasList;
+    },
+    initialDateFormatted: {
+      get: function () {
+        return this.formatDate(this.dateInicial.initialDate);
+      },
+      // setter
+      set: function (newValue) {
+        this.dateInicial.initialDate = newValue;
+      },
+    },
+    finalDateFormatted: {
+      get: function () {
+        return this.formatDate(this.dateFinal.initialDate);
+      },
+      // setter
+      set: function (newValue) {
+        this.dateFinal.initialDate = newValue;
+      },
     },
   },
 };

@@ -9,39 +9,68 @@
       <v-divider></v-divider>
       <v-card-text>
         <v-row>
-          <v-col>
-            <v-text-field
-              dense
-              type="number"
-              label="Fornecedor"
-              v-model="codigoFilter"
-              clearable
-            ></v-text-field>
+          <v-col cols="6">
+            <v-menu
+              v-model="dateInicial.initialMenuDate"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  dense
+                  v-model="initialDateFormatted"
+                  label="Data Inicial"
+                  prepend-icon="fa-calendar-alt"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="dateInicial.initialDate"
+                @input="dateInicial.initialMenuDate = false"
+              ></v-date-picker>
+            </v-menu>
           </v-col>
-          <v-col>
-            <v-text-field
-              dense
-              label="Parceiro"
-              v-model="nomeFilter"
-              clearable
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-autocomplete
-              dense
-              label="Tipo de Despesa"
-              :items="listaDeDespesas"
-              item-value="Codigo"
-              item-text="Descricao"
-              v-model="fornecedorForm"
-              clearable
-              return-object
-              :loading="loadingFornecedor"
-            ></v-autocomplete>
+          <v-col cols="6">
+            <v-menu
+              v-model="dateFinal.initialMenuDate"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  dense
+                  v-model="finalDateFormatted"
+                  label="Data Final"
+                  prepend-icon="fa-calendar-alt"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="dateFinal.initialDate"
+                @input="dateFinal.initialMenuDate = false"
+              ></v-date-picker>
+            </v-menu>
           </v-col>
         </v-row>
         <v-card-actions>
           <v-btn color="btnPrimary" @click="pesquisar()"> Pesquisar </v-btn>
+          <BtnExportToXlsx
+            :dataExport="listaItensExport"
+            :columnsExport="headersXlsExport"
+            :fileName="rel_vendas_nome"
+            sheetName="Vendas"
+            :loadingToExport="loadingExport"
+          ></BtnExportToXlsx>
         </v-card-actions>
       </v-card-text>
     </v-card>
@@ -71,12 +100,12 @@
 </template>
 
 <script>
-import { BUSCARTODOSOSPRODUTOS, EMPTYPRODUTO } from "@/store/types/ProdutoType";
+import { BUSCARTODOSOSPRODUTOS } from "@/store/types/ProdutoType";
 
-import { BUSCARLISTAPARCEIRORESUMIDA } from "@/store/types/ParceiroType";
+import BtnExportToXlsx from "@/components/Shared/BtnExportToXlsx";
 
 export default {
-  components: {},
+  components: { BtnExportToXlsx },
   data() {
     return {
       headers: [
@@ -88,14 +117,37 @@ export default {
         { text: "Data Vencimento", value: "active" },
         { text: "Ações", value: "action", sortable: false },
       ],
+      headersXlsExport: [
+        { label: "Codigo da Venda", field: "id" },
+        { label: "Data da Venda", field: "creationDateFormated" },
+        { label: "Cliente", field: "nameClient" },
+        { label: "Codigo da Venda", field: "Cliente" },
+        { label: "Código Produto", field: "alternativeId" },
+        { label: "Produto", field: "productDesciption" },
+        { label: "Total da Venda", field: "amountSale" },
+        { label: "Forma de Pagamento", field: "paymentMethod" },
+      ],
       mostrarJanela: false,
       loadingDataTable: false,
       loadingParceiros: false,
       codigoFilter: "",
       nomeFilter: "",
+      rel_vendas_nome: "",
+      loadingExport: false,
+      listaItensExport: [],
       marcaFilter: "",
       parceiroFilter: 0,
       codigoProduto: 0,
+      dateInicial: {
+        todayDate: new Date().toISOString().substr(0, 10),
+        initialMenuDate: false,
+        initialDate: new Date().toISOString().substr(0, 10),
+      },
+      dateFinal: {
+        todayDate: new Date().toISOString().substr(0, 10),
+        initialMenuDate: false,
+        initialDate: new Date().toISOString().substr(0, 10),
+      },
     };
   },
   methods: {
@@ -128,59 +180,40 @@ export default {
           }
         });
     },
-    criarProduto() {
-      this.$store.commit(EMPTYPRODUTO);
-      this.codigoProduto = 0;
-      this.mostrarJanela = true;
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
     },
-    alterarProduto(item) {
-      this.codigoProduto = item.id;
-      this.mostrarJanela = true;
-    },
-    async buscarListaDeParceiros() {
-      this.loadingParceiros = true;
-      await this.$store
-        .dispatch(BUSCARLISTAPARCEIRORESUMIDA)
-        .then(() => {
-          this.loadingParceiros = false;
-        })
-        .catch((error) => {
-          if (error) {
-            this.loadingParceiros = false;
-            let payload = {
-              message: "Ocorreu um erro ao carregar a lista de parceiros",
-              color: "error",
-            };
-            this.alertaParaUsuario(payload);
-          }
-        });
-    },
-    resetarCodigoProduto() {
-      this.codigoProduto = 0;
+    parseDate(date) {
+      if (!date) return null;
+
+      const [day, month, year] = date.split("/");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
   },
   created() {
     this.buscarListaDeParceiros();
   },
   computed: {
-    listaProdutos() {
-      return this.$store.state.ProdutoStore.produtoList;
+    initialDateFormatted: {
+      get: function () {
+        return this.formatDate(this.dateInicial.initialDate);
+      },
+      // setter
+      set: function (newValue) {
+        this.dateInicial.initialDate = newValue;
+      },
     },
-    listaParceirosResumida() {
-      return this.$store.state.ParceiroStore.listaParceiroResumida;
-    },
-    listaDeDespesas() {
-      let array = [
-        { Codigo: 1, Descricao: "Despesa com Marketing" },
-        { Codigo: 2, Descricao: "Despesa com Aluguel" },
-        { Codigo: 3, Descricao: "Despesa com Energia Elétrica" },
-        { Codigo: 4, Descricao: "Despesa com Materiais de Escritório" },
-        { Codigo: 5, Descricao: "Despesa com Funcionários" },
-        { Codigo: 6, Descricao: "Despesa com Material de Embalagem" },
-        { Codigo: 7, Descricao: "Despesa com Assessoria Jurídica" },
-        { Codigo: 8, Descricao: "Receita com Vendas (Comissões)" },
-      ];
-      return array;
+    finalDateFormatted: {
+      get: function () {
+        return this.formatDate(this.dateFinal.initialDate);
+      },
+      // setter
+      set: function (newValue) {
+        this.dateFinal.initialDate = newValue;
+      },
     },
   },
 };

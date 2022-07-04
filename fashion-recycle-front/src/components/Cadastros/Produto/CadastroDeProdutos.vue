@@ -10,32 +10,27 @@
           <v-col>
             <v-text-field
               dense
-              type="number"
               label="Codigo Produto"
               v-model="codigoFilter"
               clearable
             ></v-text-field>
           </v-col>
           <v-col>
-            <v-text-field
-              dense
-              label="Nome"
-              v-model="nomeFilter"
-              clearable
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
+            <v-autocomplete
               dense
               label="Marca"
+              :items="listaMarcas"
+              item-value="id"
+              item-text="name"
               v-model="marcaFilter"
               clearable
-            ></v-text-field>
+              :loading="loadingParceiros"
+            ></v-autocomplete>
           </v-col>
           <v-col>
             <v-autocomplete
               dense
-              label="Parceiro"
+              label="Fornecedor"
               :items="listaParceirosResumida"
               item-value="id"
               item-text="name"
@@ -47,6 +42,7 @@
         </v-row>
         <v-card-actions>
           <v-btn color="btnPrimary" @click="pesquisar()"> Pesquisar </v-btn>
+          <v-btn @click="gerenciarMarcas()" color="light-blue">Marcas</v-btn>
         </v-card-actions>
       </v-card-text>
     </v-card>
@@ -84,46 +80,54 @@
       :codigoProduto="codigoProduto"
       @resetarCodigoProduto="resetarCodigoProduto"
     />
+    <CadastroDeMarcas v-model="mostrarJanelaMarca" />
   </div>
 </template>
 
 <script>
 import CadastroDeProdutoModal from "./CadastroDeProdutoModal";
+import CadastroDeMarcas from "./Marcas/CadastroDeMarcas";
+
+import { SET_MESSAGE } from "@/store/types/NotificationType";
 
 import { BUSCARTODOSOSPRODUTOS, EMPTYPRODUTO } from "@/store/types/ProdutoType";
 
 import { BUSCARLISTAPARCEIRORESUMIDA } from "@/store/types/ParceiroType";
 
 export default {
-  components: { CadastroDeProdutoModal },
+  components: { CadastroDeProdutoModal, CadastroDeMarcas },
   data() {
     return {
       headers: [
-        { text: "Código", value: "id" },
-        { text: "Descricao", value: "name" },
+        { text: "Código", value: "alternativeId" },
+        { text: "Item", value: "name" },
+        { text: "Modelo", value: "model" },
+        { text: "Número De Série", value: "serialNumber" },
+        { text: "Cor", value: "colour" },
         { text: "Marca", value: "brand" },
-        { text: "Quantidade", value: "amountInventory" },
-        { text: "Valor Parceiro", value: "pricePartner" },
+        { text: "Valor Fornecedor", value: "pricePartner" },
+        { text: "Margem Padrão", value: "margem" },
         { text: "Valor Revenda", value: "priceSale" },
         { text: "Parceiro", value: "partnerName" },
         { text: "Ativo", value: "active" },
         { text: "Ações", value: "action", sortable: false },
       ],
       mostrarJanela: false,
+      mostrarJanelaMarca: false,
       loadingDataTable: false,
       loadingParceiros: false,
       codigoFilter: "",
       nomeFilter: "",
-      marcaFilter: "",
-      parceiroFilter: 0,
+      marcaFilter: null,
+      parceiroFilter: null,
       codigoProduto: 0,
+      margem: "30%",
     };
   },
   methods: {
     pesquisar() {
       let payload = {
-        id: parseInt(this.codigoFilter == "" ? "0" : this.codigoFilter),
-        name: this.nomeFilter,
+        id: this.codigoFilter,
         brand: this.marcaFilter,
         idPartner: this.parceiroFilter,
       };
@@ -137,6 +141,7 @@ export default {
         .dispatch(BUSCARTODOSOSPRODUTOS, payload)
         .then(() => {
           this.loadingDataTable = false;
+          this.carregarMargemPadrãoDataTable();
         })
         .catch((error) => {
           if (error) {
@@ -149,6 +154,11 @@ export default {
           }
         });
     },
+    carregarMargemPadrãoDataTable() {
+      this.listaProdutos.forEach((element) => {
+        element.margem = "30%";
+      });
+    },
     criarProduto() {
       this.$store.commit(EMPTYPRODUTO);
       this.codigoProduto = 0;
@@ -157,6 +167,10 @@ export default {
     alterarProduto(item) {
       this.codigoProduto = item.id;
       this.mostrarJanela = true;
+    },
+    gerenciarMarcas() {
+      console.log("Entrou na função");
+      this.mostrarJanelaMarca = true;
     },
     async buscarListaDeParceiros() {
       this.loadingParceiros = true;
@@ -179,6 +193,9 @@ export default {
     resetarCodigoProduto() {
       this.codigoProduto = 0;
     },
+    alertaParaUsuario(payload) {
+      this.$store.commit(SET_MESSAGE, payload);
+    },
   },
   created() {
     this.buscarListaDeParceiros();
@@ -189,6 +206,9 @@ export default {
     },
     listaParceirosResumida() {
       return this.$store.state.ParceiroStore.listaParceiroResumida;
+    },
+    listaMarcas() {
+      return this.$store.state.MarcaStore.marcaList;
     },
   },
 };
