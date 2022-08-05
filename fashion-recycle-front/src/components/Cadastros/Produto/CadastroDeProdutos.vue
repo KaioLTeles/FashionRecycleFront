@@ -108,7 +108,7 @@ export default {
         { text: "Valor Fornecedor", value: "pricePartner" },
         { text: "Margem Padrão", value: "margem" },
         { text: "Valor Revenda", value: "priceSale" },
-        { text: "Parceiro", value: "partnerName" },
+        { text: "Fornecedor", value: "partnerName" },
         { text: "Ativo", value: "active" },
         { text: "Ações", value: "action", sortable: false },
       ],

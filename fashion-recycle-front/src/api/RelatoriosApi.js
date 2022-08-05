@@ -17,6 +17,18 @@ const BuscarRelatorioPagamentos = async function (payload) {
       inicialDate: payload.inicialDate,
       finalDate: payload.finalDate,
       idPaymentType: payload.idPaymentType,
+      filtertype: payload.filtertype,
+    },
+  });
+};
+
+const GetAllSalesForCashFlow = async function (payload) {
+  return API.get("/reports/getAllSalesForCashFlow", {
+    params: {
+      inicialDate: payload.inicialDate,
+      finalDate: payload.finalDate,
+      onlyRevenue: payload.onlyRevenue,
+      onlyExpense: payload.onlyExpense,
     },
   });
 };
@@ -24,4 +36,5 @@ const BuscarRelatorioPagamentos = async function (payload) {
 export const RelatoriosApi = {
   BuscarRelatorioVendas,
   BuscarRelatorioPagamentos,
+  GetAllSalesForCashFlow
 };

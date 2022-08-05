@@ -62,13 +62,21 @@
             </v-menu>
           </v-col>
         </v-row>
+         <v-row>
+          <v-col cols="6">
+            <v-checkbox v-model="checkEntradas" label="Somente Entradas" />
+          </v-col>
+          <v-col cols="6">
+            <v-checkbox v-model="checkSaidas" label="Somente Saidas" />
+          </v-col>
+        </v-row>
         <v-card-actions>
           <v-btn color="btnPrimary" @click="pesquisar()"> Pesquisar </v-btn>
           <BtnExportToXlsx
             :dataExport="listaItensExport"
             :columnsExport="headersXlsExport"
-            :fileName="rel_vendas_nome"
-            sheetName="Vendas"
+            :fileName="rel_fluxo_caixa_nome"
+            sheetName="FluxoCaixa"
             :loadingToExport="loadingExport"
           ></BtnExportToXlsx>
         </v-card-actions>
@@ -81,18 +89,8 @@
           :headers="headers"
           item-key="codigo"
           :loading="loadingDataTable"
-        >
-          <template v-slot:[`item.action`]="{ item }">
-            <v-icon color="btnPrimary" @click.stop="alterarProduto(item)"
-              >mdi-pencil</v-icon
-            >
-          </template>
-          <template v-slot:[`item.active`]="{ item }">
-            <v-simple-checkbox
-              v-model="item.active"
-              disabled
-            ></v-simple-checkbox>
-          </template>
+          :items="listaRelFluxoCaixa"
+        >          
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -100,7 +98,7 @@
 </template>
 
 <script>
-import { BUSCARTODOSOSPRODUTOS } from "@/store/types/ProdutoType";
+import { BUSCARRELATORIOFLUXOCAIXA } from "@/store/types/RelatorioType";
 
 import BtnExportToXlsx from "@/components/Shared/BtnExportToXlsx";
 
@@ -109,35 +107,22 @@ export default {
   data() {
     return {
       headers: [
-        { text: "Código", value: "id" },
-        { text: "Fornecedor", value: "name" },
-        { text: "Parceiro", value: "email" },
-        { text: "Classificação", value: "phoneNumber" },
-        { text: "Valor", value: "cpf" },
-        { text: "Data Vencimento", value: "active" },
-        { text: "Ações", value: "action", sortable: false },
+        { text: "Data", value: "rowDateText" },
+        { text: "Entradas", value: "valueRevenue" },
+        { text: "Saidas", value: "valueExpense" },
+        { text: "Saldo", value: "balance" },        
       ],
       headersXlsExport: [
-        { label: "Codigo da Venda", field: "id" },
-        { label: "Data da Venda", field: "creationDateFormated" },
-        { label: "Cliente", field: "nameClient" },
-        { label: "Codigo da Venda", field: "Cliente" },
-        { label: "Código Produto", field: "alternativeId" },
-        { label: "Produto", field: "productDesciption" },
-        { label: "Total da Venda", field: "amountSale" },
-        { label: "Forma de Pagamento", field: "paymentMethod" },
+        { label: "Data", field: "rowDateText" },
+        { label: "Entradas", field: "valueRevenue" },
+        { label: "Saidas", field: "valueExpense" },
+        { label: "Saldo", field: "balance" },
       ],
       mostrarJanela: false,
       loadingDataTable: false,
       loadingParceiros: false,
-      codigoFilter: "",
-      nomeFilter: "",
-      rel_vendas_nome: "",
-      loadingExport: false,
-      listaItensExport: [],
-      marcaFilter: "",
-      parceiroFilter: 0,
-      codigoProduto: 0,
+      checkEntradas: true,
+      checkSaidas: true,
       dateInicial: {
         todayDate: new Date().toISOString().substr(0, 10),
         initialMenuDate: false,
@@ -153,10 +138,10 @@ export default {
   methods: {
     pesquisar() {
       let payload = {
-        id: parseInt(this.codigoFilter == "" ? "0" : this.codigoFilter),
-        name: this.nomeFilter,
-        brand: this.marcaFilter,
-        idPartner: this.parceiroFilter,
+        inicialDate: this.dateInicial.initialDate,
+        finalDate: this.dateFinal.initialDate,
+        onlyRevenue: this.checkEntradas,
+        onlyExpense: this.checkSaidas,
       };
 
       this.loadingDataTable = true;
@@ -165,7 +150,7 @@ export default {
     },
     async buscarDadosProduto(payload) {
       await this.$store
-        .dispatch(BUSCARTODOSOSPRODUTOS, payload)
+        .dispatch(BUSCARRELATORIOFLUXOCAIXA, payload)
         .then(() => {
           this.loadingDataTable = false;
         })
@@ -173,7 +158,7 @@ export default {
           if (error) {
             this.loadingDataTable = false;
             let payload = {
-              message: "Ocorreu um erro ao carregar os dados de produtos",
+              message: "Ocorreu um erro ao carregar os dados do relatório",
               color: "error",
             };
             this.alertaParaUsuario(payload);
@@ -214,6 +199,9 @@ export default {
       set: function (newValue) {
         this.dateFinal.initialDate = newValue;
       },
+    },
+    listaRelFluxoCaixa() {
+      return this.$store.state.RelatorioStore.relFluxoCaixa;
     },
   },
 };

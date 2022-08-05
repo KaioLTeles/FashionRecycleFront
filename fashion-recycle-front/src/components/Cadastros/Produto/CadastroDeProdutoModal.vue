@@ -139,7 +139,7 @@ export default {
     return {
       valid: false,
       codigoForm: "0",
-      ativoForm: false,
+      ativoForm: true,
       precoVendaForm: 0.0,
       precoParceiroForm: 0.0,
       parceiroForm: 0,

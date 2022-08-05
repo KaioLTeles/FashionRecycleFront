@@ -71,13 +71,23 @@
               v-model="tipoDespesaFilter"
             ></v-select>
           </v-col>
+          <v-col>
+            <v-select
+              dense
+              label="Status do Pagamento"
+              :items="listaStatus"
+              item-value="Codigo"
+              item-text="Descricao"
+              v-model="statusPagamentoFilter"
+            ></v-select>
+          </v-col>
         </v-row>
         <v-card-actions>
           <v-btn color="btnPrimary" @click="pesquisar()"> Pesquisar </v-btn>
           <BtnExportToXlsx
             :dataExport="listaItensExport"
             :columnsExport="headersXlsExport"
-            :fileName="rel_pag_nome"
+            :fileName="relpagnome"
             sheetName="Pagamentos"
             :loadingToExport="loadingExport"
           ></BtnExportToXlsx>
@@ -128,7 +138,8 @@ export default {
       loadingExport: false,
       loadingParceiros: false,
       tipoDespesaFilter: 0,
-      rel_pag_nome: "Rel_Pag_Export",
+      statusPagamentoFilter: 0,
+      relpagnome: "Rel-Pag-Export",
       dateInicial: {
         todayDate: new Date().toISOString().substr(0, 10),
         initialMenuDate: false,
@@ -150,6 +161,7 @@ export default {
           this.tipoDespesaFilter == null || this.tipoDespesaFilter == ""
             ? 0
             : this.tipoDespesaFilter,
+            filtertype: this.statusPagamentoFilter
       };
 
       this.loadingDataTable = true;
@@ -221,6 +233,15 @@ export default {
         { Codigo: 10, Descricao: "Despesa com Materiais de Escritório" },
         { Codigo: 11, Descricao: "Despesa com Limpeza e Conservação" },
         { Codigo: 12, Descricao: "Receita com Vendas (Comissões)" },
+      ];
+      return array;
+    },
+    listaStatus() {
+      let array = [
+        { Codigo: 0, Descricao: "-" },
+        { Codigo: 1, Descricao: "Pagamentos Liquidados" },
+        { Codigo: 2, Descricao: "Pagamentos Vencidos" },
+        { Codigo: 3, Descricao: "Pagamentos a Vencer" },
       ];
       return array;
     },

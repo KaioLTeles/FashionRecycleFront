@@ -28,6 +28,7 @@ const CriarOuAlterarPagamento = async function (payload) {
     idPaymentType: payload.idPaymentType,
     amount: payload.amount,
     paymentDate: payload.paymentDate,
+    paymentMade: payload.paymentMade,
   });
 };
 

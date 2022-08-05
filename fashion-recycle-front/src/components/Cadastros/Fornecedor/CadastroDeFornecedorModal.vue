@@ -125,7 +125,7 @@ export default {
       enderecoForm: "",
       numeroForm: "",
       cepForm: "",
-      ativoForm: false,
+      ativoForm: true,
     };
   },
   computed: {

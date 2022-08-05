@@ -64,6 +64,9 @@
                     ></v-date-picker>
                   </v-menu>
                 </v-col>
+                <v-col cols="12">
+                  <v-checkbox v-model="pagoForm" label="Pagamento Liquidado" />
+                </v-col>
               </v-row>
             </v-form>
           </v-container>
@@ -106,6 +109,7 @@ export default {
       },
       historicoForm: "",
       tipoDespesaForm: 0,
+      pagoForm: false,
     };
   },
   computed: {
@@ -199,6 +203,7 @@ export default {
         idPaymentType: this.tipoDespesaForm,
         amount: this.valorForm,
         paymentDate: this.date.initialDate,
+        paymentMade: this.pagoForm
       };
 
       this.$store
@@ -216,7 +221,7 @@ export default {
           if (error) {
             this.loadingParceiros = false;
             let payload = {
-              message: "Ocorreu um erro ao carregar a lista de parceiros",
+              message: "Ocorreu um erro ao criar/alterar pagamento",
               color: "error",
             };
             this.alertaParaUsuario(payload);
@@ -235,6 +240,7 @@ export default {
             this.carregarDadosForm();
           })
           .catch((error) => {
+            console.log(error)
             if (error) {
               let payload = {
                 message: "Ocorreu um erro ao carregar os dados do pagamento",
@@ -265,9 +271,9 @@ export default {
       this.valorForm = this.pagamentoSelecionado.amount;
       this.historicoForm = this.pagamentoSelecionado.name;
       this.tipoDespesaForm = this.pagamentoSelecionado.paymenyType.id;
-      this.data.initialDate = Date(
-        this.pagamentoSelecionado.paymentDateFormated
-      );
+      this.pagoForm = this.pagamentoSelecionado.paymentMade
+      this.date.initialDate = this.pagamentoSelecionado.paymentDateFormated
+      ;
     },
     alertaParaUsuario(payload) {
       this.$store.commit(SET_MESSAGE, payload);
