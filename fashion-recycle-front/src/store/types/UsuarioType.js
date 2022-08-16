@@ -24,6 +24,9 @@ export const INSERIR_USUARIO_PAPEL_COMERCIAL = 'InsertUsuarioPapelFromComercial'
 export const ATUALIZAR_USUARIO_PAPEL_COMERCIAL = 'UpdateUsuarioPapelFromComercial'
 export const DELETE_USUARIO_PAPEL_COMERCIAL = 'DeleteUsuarioPapelFromComercial'
 export const GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO = 'getPapeisSupervisoresByOrganizacao'
+export const BUSCARTODOSOSUSUARIOS = 'getAllUserByFilter'
+export const BUSCARUSERPELOID = 'getuser'
+export const EMPTYUSER = 'limpauser'
 
 export default {
     AUTENTICAR,
@@ -51,5 +54,8 @@ export default {
     INSERIR_USUARIO_PAPEL_COMERCIAL,
     ATUALIZAR_USUARIO_PAPEL_COMERCIAL,
     DELETE_USUARIO_PAPEL_COMERCIAL,
-    GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO
+    GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO,
+    BUSCARTODOSOSUSUARIOS,
+    BUSCARUSERPELOID,
+    EMPTYUSER
 }

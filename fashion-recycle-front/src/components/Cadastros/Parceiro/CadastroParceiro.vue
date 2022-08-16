@@ -135,7 +135,7 @@ export default {
           if (error) {
             this.loadingDataTable = false;
             let payload = {
-              message: "Ocorreu um erro ao carregar os dados de cliente",
+              message: "Ocorreu um erro ao carregar os dados de Fornecedor",
               color: "error",
             };
             this.alertaParaUsuario(payload);

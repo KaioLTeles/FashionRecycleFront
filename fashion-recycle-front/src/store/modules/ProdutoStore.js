@@ -9,6 +9,7 @@ import {
   ALTERAROUCRIARPRODUTO,
   EMPTYPRODUTO,
   BUSCARPRODUTOSDISPONIVEISPARAVENDA,
+  BUSCARPRODUTOSPORFORNECEDORDISPONIVEISPARAVENDA
 } from "@/store/types/ProdutoType";
 
 Vue.use(Vuex);
@@ -19,6 +20,7 @@ const getDefaultState = () => {
     produtoObjeto: {},
     retornoCriacaoProduto: "",
     produtoVendaList: [],
+    produtoPorFornecedorList: []
   };
 };
 
@@ -42,6 +44,9 @@ const mutations = {
   [BUSCARPRODUTOSDISPONIVEISPARAVENDA](state, response) {
     state.produtoVendaList = response;
   },
+  [BUSCARPRODUTOSPORFORNECEDORDISPONIVEISPARAVENDA](state, response) {
+    state.produtoPorFornecedorList = response;
+  },
 };
 
 const actions = {
@@ -63,6 +68,11 @@ const actions = {
   async [BUSCARPRODUTOSDISPONIVEISPARAVENDA](context) {
     return ProdutoApi.BuscarProdutosParaVenda().then((response) => {
       context.commit(BUSCARPRODUTOSDISPONIVEISPARAVENDA, response.data);
+    });
+  },
+  async [BUSCARPRODUTOSPORFORNECEDORDISPONIVEISPARAVENDA](context, payload) {
+    return ProdutoApi.BuscarProdutoParaVendoPorFornecedor(payload).then((response) => {
+      context.commit(BUSCARPRODUTOSPORFORNECEDORDISPONIVEISPARAVENDA, response.data);
     });
   },
 };

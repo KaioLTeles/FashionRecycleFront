@@ -31,6 +31,7 @@ const AlterarOuCriarParceiro = async function (payload) {
     streetNumber: payload.streetNumber,
     cep: payload.cep,
     active: payload.active,
+    dateOfBirth: payload.dateOfBirth,
   });
 };
 

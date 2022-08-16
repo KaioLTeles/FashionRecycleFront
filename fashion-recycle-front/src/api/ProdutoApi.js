@@ -33,8 +33,18 @@ const AlterarOuCriarProduto = async function (payload) {
     colour: payload.colour,
     observation: payload.observation,
     brandId: payload.brandId,
+    margim: payload.margim
   });
 };
+
+const BuscarProdutoParaVendoPorFornecedor = async function (payload) {
+  return API.get("/product/getProductByPartnerForSale", {
+    params: {
+      idPartner: payload.idPartner,
+    },
+  });
+};
+
 
 const BuscarProdutosParaVenda = async function () {
   return API.get("/product/getProductAllForSale");
@@ -45,4 +55,5 @@ export const ProdutoApi = {
   BuscarProdutoPorId,
   AlterarOuCriarProduto,
   BuscarProdutosParaVenda,
+  BuscarProdutoParaVendoPorFornecedor
 };

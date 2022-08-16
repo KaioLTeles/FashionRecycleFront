@@ -21,6 +21,14 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
+                    label="Data Criação"
+                    v-model="dataCriacaoForm"
+                    disabled
+                    clearable
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
                     label="Item*"
                     v-model="nomeForm"
                     clearable
@@ -35,7 +43,7 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="Número de Série*"
+                    label="Número de Série"
                     v-model="serieForm"
                     clearable
                   ></v-text-field>
@@ -89,7 +97,7 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="Preço Parceiro*"
+                    label="Preço Fornecedor*"
                     v-model="precoParceiroForm"
                     type="number"
                     clearable
@@ -99,6 +107,15 @@
                   <v-text-field
                     label="Preço Venda*"
                     v-model="precoVendaForm"
+                    type="number"
+                    clearable
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-text-field
+                    label="Margem%"
+                    v-model="margemForm"
+                    disabled
                     type="number"
                     clearable
                   ></v-text-field>
@@ -148,9 +165,11 @@ export default {
       nomeForm: "",
       statusForm: 0,
       situacaoForm: 0,
+      dataCriacaoForm: "",
       corForm: "",
       serieForm: "",
       modeloForm: "",
+      margemForm: 0,
       idBanco: 0,
     };
   },
@@ -211,9 +230,12 @@ export default {
     },
     salvar() {
       if (this.precoVendaForm > 0.0 && this.precoParceiroForm > 0.0) {
-        if (this.precoParceiroForm > this.precoVendaForm) {
+        console.log(this.precoParceiroForm + "-" + this.precoVendaForm);
+        if (
+          parseFloat(this.precoParceiroForm) > parseFloat(this.precoVendaForm)
+        ) {
           let payload = {
-            message: "O preço do parceiro não pode ser maior que o de venda!",
+            message: "O preço do fornecedor não pode ser maior que o de venda!",
             color: "warning",
           };
           this.alertaParaUsuario(payload);
@@ -248,11 +270,13 @@ export default {
         colour: this.corForm,
         observation: this.situacaoForm,
         brandId: this.marcaForm,
+        margim: this.margemForm
       };
+      console.log(payload)
       this.$store
         .dispatch(ALTERAROUCRIARPRODUTO, payload)
         .then(() => {
-          if (this.codigoForm == "0" || this.codigoForm == "") {
+          if (this.idBanco == "0" || this.idBanco == ""|| this.idBanco == 0) {
             let payload = {
               message: "Produto criado com sucesso!",
               color: "success",
@@ -282,6 +306,7 @@ export default {
       this.$store.commit(SET_MESSAGE, payload);
     },
     async buscarProduto() {
+      console.log(this.codigoProduto)
       if (this.codigoProduto != 0) {
         console.log(this.codigoProduto);
         let payload = {
@@ -302,6 +327,10 @@ export default {
               this.alertaParaUsuario(payload);
             }
           });
+      } else {
+        this.$store.commit(EMPTYPRODUTO);
+        this.ativoForm = true;
+        this.statusForm = 1
       }
     },
     async buscarListaDeParceiros() {
@@ -315,7 +344,7 @@ export default {
           if (error) {
             this.loadingParceiros = false;
             let payload = {
-              message: "Ocorreu um erro ao carregar a lista de parceiros",
+              message: "Ocorreu um erro ao carregar a lista de fornecedores",
               color: "error",
             };
             this.alertaParaUsuario(payload);
@@ -337,6 +366,7 @@ export default {
       this.corForm = this.produtoSelecionado.colour;
       this.serieForm = this.produtoSelecionado.serialNumber;
       this.modeloForm = this.produtoSelecionado.model;
+      this.dataCriacaoForm = this.produtoSelecionado.creationDateFormat;
     },
     limparCamposForm() {
       this.codigoForm = "0";
@@ -352,11 +382,15 @@ export default {
       this.corForm = "";
       this.serieForm = "";
       this.modeloForm = "";
+      this.dataCriacaoForm = "";
+      this.idBanco = 0;
     },
   },
   watch: {
-    precoParceiroForm() {
-      this.precoVendaForm = this.precoParceiroForm * this.margem;
+    precoVendaForm() {
+      this.margemForm =
+        ((this.precoVendaForm - this.precoParceiroForm) / this.precoVendaForm) *
+        100;
     },
   },
 };

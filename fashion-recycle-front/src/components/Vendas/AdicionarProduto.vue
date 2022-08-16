@@ -14,18 +14,32 @@
                 <v-col cols="12">
                   <v-autocomplete
                     dense
+                    label="Fornecedor"
+                    :items="listaParceirosResumida"
+                    item-value="id"
+                    :loading="loadingFornecedor"
+                    item-text="name"
+                    v-model="fornecedorForm"
+                    clearable
+                    return-object
+                  ></v-autocomplete>
+                </v-col>
+                <v-col cols="12">
+                  <v-autocomplete
+                    dense
                     label="Produto"
-                    :items="listaProdutosParaVenda"
+                    :items="listaProdutosParaVendaPorFornecedor"
                     item-value="id"
                     item-text="name"
                     v-model="produtoForm"
+                    :loading="loadingProduto"
                     clearable
                     return-object
                   ></v-autocomplete>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="Preço Unitário"
+                    label="Valor do Produto"
                     v-model="precoVendaForm"
                     clearable
                   ></v-text-field>
@@ -45,7 +59,12 @@
 </template>
 
 <script>
-import { BUSCARPRODUTOSDISPONIVEISPARAVENDA } from "@/store/types/ProdutoType";
+import {
+  BUSCARPRODUTOSDISPONIVEISPARAVENDA,
+  BUSCARPRODUTOSPORFORNECEDORDISPONIVEISPARAVENDA,
+} from "@/store/types/ProdutoType";
+
+import { BUSCARLISTAPARCEIRORESUMIDA } from "@/store/types/ParceiroType";
 
 import { ADICIONARPRODUTONALISTA } from "@/store/types/VendasType";
 
@@ -59,6 +78,9 @@ export default {
       produtoForm: null,
       precoVendaForm: 0,
       quantidadeForm: 1,
+      fornecedorForm: 0,
+      loadingProduto: false,
+      loadingFornecedor: false,
     };
   },
   computed: {
@@ -73,12 +95,18 @@ export default {
     listaProdutosParaVenda() {
       return this.$store.state.ProdutoStore.produtoVendaList;
     },
+    listaProdutosParaVendaPorFornecedor() {
+      return this.$store.state.ProdutoStore.produtoPorFornecedorList;
+    },
     itemsVenda() {
       return this.$store.state.VendasStore.listaItensVenda;
     },
+    listaParceirosResumida() {
+      return this.$store.state.ParceiroStore.listaParceiroResumida;
+    },
   },
-  updated() {
-    this.buscarProdutosVenda();
+  created() {
+    this.buscarListaDeParceiros();
   },
   methods: {
     fechar() {
@@ -158,10 +186,57 @@ export default {
           }
         });
     },
+    async buscarProdutosVendaPorFornecedor(payload) {
+      this.loadingProduto = true;
+      await this.$store
+        .dispatch(BUSCARPRODUTOSPORFORNECEDORDISPONIVEISPARAVENDA, payload)
+        .then(() => {
+          this.loadingProduto = false;
+        })
+        .catch((error) => {
+          this.loadingProduto = false;
+          if (error) {
+            let payload = {
+              message: "Ocorreu um erro ao carregar a lista de produtos",
+              color: "error",
+            };
+            this.alertaParaUsuario(payload);
+          }
+        });
+    },
+    async buscarListaDeParceiros() {
+      this.loadingFornecedor = true;
+      await this.$store
+        .dispatch(BUSCARLISTAPARCEIRORESUMIDA)
+        .then(() => {
+          this.loadingFornecedor = false;
+        })
+        .catch((error) => {
+          if (error) {
+            this.loadingFornecedor = false;
+            let payload = {
+              message: "Ocorreu um erro ao carregar a lista de parceiros",
+              color: "error",
+            };
+            this.alertaParaUsuario(payload);
+          }
+        });
+    },
   },
   watch: {
     produtoForm() {
       this.precoVendaForm = this.produtoForm.priceSale;
+    },
+    fornecedorForm(newValue) {
+      if (newValue != null && newValue != undefined && newValue != 0) {
+        let payload = {
+          idPartner: this.fornecedorForm.id,
+        };
+        this.buscarProdutosVendaPorFornecedor(payload);
+      }
+      else{
+        this.produtoForm = 0
+      }
     },
   },
 };

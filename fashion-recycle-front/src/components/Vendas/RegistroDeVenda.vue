@@ -10,7 +10,7 @@
           <v-col>
             <v-autocomplete
               dense
-              label="Cliente"
+              label="Comprador"
               :items="listaDeClientes"
               item-value="id"
               item-text="name"
@@ -234,7 +234,7 @@ export default {
         { text: "Codigo Produto", value: "idProduto" },
         { text: "Descrição Produto", value: "descricaoProduto" },
         { text: "Quantidade", value: "quantidade" },
-        { text: "Preço Unitário", value: "precoDevenda" },
+        { text: "Valor do Produto", value: "precoDevenda" },
         { text: "Ações", value: "action", sortable: false },
       ],
       valorDoPedido: 0,

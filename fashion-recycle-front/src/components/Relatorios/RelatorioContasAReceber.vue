@@ -2,7 +2,7 @@
   <div>
     <v-card class="margin-bottom-1-em">
       <v-card-title>
-        <v-toolbar-title class="title">Relatorio de Vendas</v-toolbar-title>
+        <v-toolbar-title class="title">Relatorio de Contas a Receber</v-toolbar-title>
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text>
@@ -58,51 +58,7 @@
                 @input="dateFinal.initialMenuDate = false"
               ></v-date-picker>
             </v-menu>
-          </v-col>
-          <v-col>
-            <v-text-field
-              dense
-              label="Codigo Venda"
-              v-model="codigoVendaFilter"
-              clearable
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-autocomplete
-              dense
-              label="Comprador"
-              :items="listaDeClientes"
-              item-value="id"
-              item-text="name"
-              v-model="clienteFilter"
-              clearable
-              :loading="loadingCampoCliente"
-            ></v-autocomplete>
-          </v-col>
-          <v-col>
-            <v-autocomplete
-              dense
-              label="Marca"
-              :items="listaMarcas"
-              item-value="id"
-              item-text="name"
-              v-model="marcaFilter"
-              clearable
-              :loading="loadingCampoMarca"
-            ></v-autocomplete>
-          </v-col>
-          <v-col>
-            <v-autocomplete
-              dense
-              label="Fornecedor"
-              :items="listaParceirosResumida"
-              item-value="id"
-              item-text="name"
-              v-model="parceiroFilter"
-              clearable
-              :loading="loadingParceiros"
-            ></v-autocomplete>
-          </v-col>
+          </v-col>          
         </v-row>
         <v-card-actions>
           <v-btn color="btnPrimary" @click="pesquisar()"> Pesquisar </v-btn>
@@ -158,10 +114,7 @@ export default {
       headers: [
         { text: "Codigo da Venda", value: "id" },
         { text: "Data da Venda", value: "creationDateFormated" },
-        { text: "Comprador", value: "nameClient" },
-        { text: "Código Produto", value: "alternativeId" },
-        { text: "Produto", value: "productDesciption" },
-        { text: "Total da Venda", value: "amountSale" },
+        { text: "Total a Receber", value: "amountSale" },
         { text: "Forma de Pagamento", value: "paymentMethod" },
       ],
       mostrarJanela: false,

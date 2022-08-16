@@ -2,34 +2,24 @@
   <div>
     <v-card class="margin-bottom-1-em">
       <v-card-title>
-        <v-toolbar-title class="title">Cadastro de Comprador</v-toolbar-title>
+        <v-toolbar-title class="title">Gestão de Usuarios</v-toolbar-title>
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text>
-        <v-row>
+        <v-row>          
           <v-col>
             <v-text-field
               dense
-              v-model="codigoClienteFilter"
-              type="number"
-              label="Codigo Cliente"
+              label="Nome"
+              v-model="nomeFilter"
               clearable
             ></v-text-field>
           </v-col>
           <v-col>
             <v-text-field
               dense
-              v-model="nomeClienteFilter"
-              label="Nome Cliente"
-              clearable
-            ></v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-              dense
-              v-model="cpfClienteFilter"
-              label="CPF"
-              type="number"
+              label="E-mail"
+              v-model="emailFilter"
               clearable
             ></v-text-field>
           </v-col>
@@ -43,7 +33,7 @@
     <v-card>
       <v-card-actions>
         <v-col class="text-right">
-          <v-btn @click="criarCliente()" dark color="btnPrimary">Novo</v-btn>
+          <v-btn @click="criarUsuario()" dark color="btnPrimary">Novo</v-btn>
         </v-col>
       </v-card-actions>
 
@@ -51,11 +41,11 @@
         <v-data-table
           :headers="headers"
           item-key="codigo"
-          :items="listClientes"
+          :items="listaUsuarios"
           :loading="loadingDataTable"
         >
           <template v-slot:[`item.action`]="{ item }">
-            <v-icon color="btnPrimary" @click.stop="alterCliente(item)"
+            <v-icon color="btnPrimary" @click.stop="alterarUsuario(item)"
               >mdi-pencil</v-icon
             >
           </template>
@@ -68,70 +58,60 @@
         </v-data-table>
       </v-card-text>
     </v-card>
-    <CadastroDeClienteModal
+    <CadastroDeUsuarioModal
       v-model="mostrarJanela"
-      :codigoCliente="codigoCliente"
-      @resetarCodigoCliente="resetarCodigoCliente"
+      :codigoUsuario="codigoUsuario"
+      @resetarcodigoUsuario="resetarcodigoUsuario"
     />
   </div>
 </template>
 
 <script>
-import {
-  BUSCARTODOSCLIENTES,
-  EMPTYBUSCARCLIENTEPELOID,
-} from "@/store/types/ClienteType";
+import CadastroDeUsuarioModal from "./CadastroDeUsuarioModal";
+
+import { BUSCARTODOSOSUSUARIOS } from "@/store/types/UsuarioType";
 
 import { SET_MESSAGE } from "@/store/types/NotificationType";
 
-import CadastroDeClienteModal from "./CadastroDeClienteModal";
-
 export default {
-  components: { CadastroDeClienteModal },
+  components: { CadastroDeUsuarioModal },
   data() {
     return {
       headers: [
-        { text: "Código", value: "id" },
-        { text: "Nome", value: "name" },
-        { text: "Email", value: "email" },
-        { text: "Telefone", value: "phoneNumber" },
-        { text: "Cpf", value: "cpf" },
+        { text: "Usuario", value: "userName" },
+        { text: "Nome", value: "name" }, 
+        { text: "Email", value: "email" },        
         { text: "Ativo", value: "active" },
         { text: "Ações", value: "action", sortable: false },
       ],
-      codigoClienteFilter: "",
-      nomeClienteFilter: "",
-      cpfClienteFilter: "",
-      loadingDataTable: false,
       mostrarJanela: false,
-      codigoCliente: 0,
+      nomeFilter: "",
+      codigoUsuario: 0,
+      emailFilter: "",
+      loadingDataTable: false,
     };
   },
   methods: {
-    criarCliente() {
-      this.$store.commit(EMPTYBUSCARCLIENTEPELOID);
-      this.codigoCliente = 0;
+    criarUsuario() {
       this.mostrarJanela = true;
     },
-    alterCliente(item) {
-      this.$store.commit(EMPTYBUSCARCLIENTEPELOID);
-      this.codigoCliente = item.id;
+    alterarUsuario(item) {
+      this.codigoUsuario = item.id;
       this.mostrarJanela = true;
     },
     pesquisar() {
-      let payload = {
-        idClient: parseInt(this.codigoClienteFilter),
-        nameClient: this.nomeClienteFilter,
-        cpfClient: this.cpfClienteFilter,
+      let payload = {        
+        name: this.nomeFilter,
+        email: this.emailFilter
       };
 
       this.loadingDataTable = true;
 
-      this.buscarDadosClientes(payload);
+      this.buscarUsuarios(payload);
     },
-    async buscarDadosClientes(payload) {
+    async buscarUsuarios(payload) {
       await this.$store
-        .dispatch(BUSCARTODOSCLIENTES, payload)
+        .dispatch(BUSCARTODOSOSUSUARIOS, payload)
         .then(() => {
           this.loadingDataTable = false;
         })
@@ -139,7 +119,7 @@ export default {
           if (error) {
             this.loadingDataTable = false;
             let payload = {
-              message: "Ocorreu um erro ao carregar os dados de comprador",
+              message: "Ocorreu um erro ao carregar a lista dos usuarios",
               color: "error",
             };
             this.alertaParaUsuario(payload);
@@ -149,14 +129,14 @@ export default {
     alertaParaUsuario(payload) {
       this.$store.commit(SET_MESSAGE, payload);
     },
-    resetarCodigoCliente() {
-      this.codigoCliente = 0;
+    resetarcodigoUsuario() {
+      this.codigoUsuario = 0;
     },
   },
   created() {},
   computed: {
-    listClientes() {
-      return this.$store.state.ClienteStore.clientList;
+    listaUsuarios() {
+      return this.$store.state.UsuarioStore.listaTodosOsUsuarios;
     },
   },
 };

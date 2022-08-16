@@ -67,6 +67,9 @@
                 <v-col cols="12">
                   <v-checkbox v-model="pagoForm" label="Pagamento Liquidado" />
                 </v-col>
+                <v-col cols="12">
+                  <v-checkbox v-model="pagRecorrentForm" label="Pagamento Recorrente" />
+                </v-col>
               </v-row>
             </v-form>
           </v-container>
@@ -110,6 +113,7 @@ export default {
       historicoForm: "",
       tipoDespesaForm: 0,
       pagoForm: false,
+      pagRecorrentForm: false
     };
   },
   computed: {
@@ -203,7 +207,8 @@ export default {
         idPaymentType: this.tipoDespesaForm,
         amount: this.valorForm,
         paymentDate: this.date.initialDate,
-        paymentMade: this.pagoForm
+        paymentMade: this.pagoForm,
+        recurringPayment: this.pagRecorrentForm
       };
 
       this.$store
@@ -273,6 +278,7 @@ export default {
       this.tipoDespesaForm = this.pagamentoSelecionado.paymenyType.id;
       this.pagoForm = this.pagamentoSelecionado.paymentMade
       this.date.initialDate = this.pagamentoSelecionado.paymentDateFormated
+      this.pagRecorrentForm = this.pagamentoSelecionado.recurringPayment
       ;
     },
     alertaParaUsuario(payload) {

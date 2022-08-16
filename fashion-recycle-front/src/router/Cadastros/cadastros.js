@@ -2,6 +2,7 @@ import cadastroDeClientesPage from "@/pages/Cadastros/CadastroDeClientePage";
 import cadastroDeFornecedorPage from "@/pages/Cadastros/CadastroDeFornecedorPage";
 import cadastroDeProdutoPage from "@/pages/Cadastros/CadastroDeProdutoPage";
 import cadastroDeParceiroPage from "@/pages/Cadastros/CadastroDeParceiroPage";
+import usuarioPage from "@/pages/Usuario/UsuarioPage";
 
 const routes = {
   cadastroDeCliente: {
@@ -29,6 +30,13 @@ const routes = {
     path: "/cadastros/parceiros",
     name: "CadastroDeParceiro",
     component: cadastroDeParceiroPage,
+    meta: { requiresAuth: true },
+    show: true,
+  },
+  gestaoDeUsuario: {
+    path: "/usuarios",
+    name: "GestaoDeUsuarios",
+    component: usuarioPage,
     meta: { requiresAuth: true },
     show: true,
   },

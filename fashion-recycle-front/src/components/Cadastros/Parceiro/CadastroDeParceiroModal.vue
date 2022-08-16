@@ -28,6 +28,32 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
+                  <v-menu
+                    v-model="date.initialMenuDate"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        dense
+                        v-model="initialDateFormatted"
+                        label="Data de Nascimento"
+                        prepend-icon="fa-calendar-alt"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="date.initialDate"
+                      @input="date.initialMenuDate = false"
+                    ></v-date-picker>
+                  </v-menu>
+                </v-col>
+                <v-col cols="12">
                   <v-text-field
                     label="E-mail*"
                     v-model="emailForm"
@@ -118,6 +144,11 @@ export default {
       numeroForm: "",
       cepForm: "",
       ativoForm: true,
+      date: {
+        todayDate: new Date().toISOString().substr(0, 10),
+        initialMenuDate: false,
+        initialDate: new Date().toISOString().substr(0, 10),
+      },
     };
   },
   computed: {
@@ -132,6 +163,15 @@ export default {
     },
     ParceiroSelecionado() {
       return this.$store.state.ParceiroStore.parceiroObjeto;
+    },
+    initialDateFormatted: {
+      get: function () {
+        return this.formatDate(this.date.initialDate);
+      },
+      // setter
+      set: function (newValue) {
+        this.date.initialDate = newValue;
+      },
     },
   },
   methods: {
@@ -180,20 +220,21 @@ export default {
         streetNumber: this.numeroForm,
         cep: this.cepForm == "" ? "" : this.cepForm.replace("-", ""),
         active: this.ativoForm,
+        dateOfBirth: this.date.initialDate,
       };
       this.$store
         .dispatch(ALTERAROUCRIARPARCEIRO, payload)
         .then(() => {
           if (this.codigoForm == "0" || this.codigoForm == "") {
             let payload = {
-              message: "Parceiro criado com sucesso!",
+              message: "Fornecedor criado com sucesso!",
               color: "success",
             };
             this.alertaParaUsuario(payload);
             this.fechar();
           } else {
             let payload = {
-              message: "Parceiro alterado com sucesso!",
+              message: "Fornecedor alterado com sucesso!",
               color: "success",
             };
             this.alertaParaUsuario(payload);
@@ -203,7 +244,7 @@ export default {
         .catch((error) => {
           if (error) {
             let payload = {
-              message: "Ocorreu um erro ao criar o Parceiro",
+              message: "Ocorreu um erro ao criar o Fornecedor",
               color: "error",
             };
             this.alertaParaUsuario(payload);
@@ -227,7 +268,7 @@ export default {
           .catch((error) => {
             if (error) {
               let payload = {
-                message: "Ocorreu um erro ao carregar os dados do parceiro",
+                message: "Ocorreu um erro ao carregar os dados do Fornecedor",
                 color: "error",
               };
               this.alertaParaUsuario(payload);
@@ -245,6 +286,7 @@ export default {
       this.numeroForm = this.ParceiroSelecionado.streetNumber;
       this.cepForm = this.ParceiroSelecionado.cep;
       this.ativoForm = this.ParceiroSelecionado.active;
+      this.date.initialDate = this.ParceiroSelecionado.dateOfBirthFormat
     },
     limparCamposForm() {
       this.codigoForm = 0;
@@ -256,6 +298,18 @@ export default {
       this.numeroForm = "";
       this.cepForm = "";
       this.ativoForm = false;
+    },
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
+    parseDate(date) {
+      if (!date) return null;
+
+      const [day, month, year] = date.split("/");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
   },
 };

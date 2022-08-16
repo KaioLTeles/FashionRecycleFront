@@ -3,7 +3,7 @@
     <v-dialog v-model="show" persistent max-width="800px">
       <v-card>
         <v-card-title class="justify-center">
-          Cadastro de Cliente
+          Cadastro de Comprador
           <v-spacer />
           <v-icon medium @click.stop="fechar"> mdi-close </v-icon>
         </v-card-title>
@@ -13,7 +13,7 @@
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    label="Código Cliente"
+                    label="Código Comprador"
                     v-model="codigoForm"
                     disabled
                     clearable
@@ -29,9 +29,8 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="E-mail*"
+                    label="E-mail"
                     v-model="emailForm"
-                    :rules="emailRule"
                     clearable
                   ></v-text-field>
                 </v-col>
@@ -46,9 +45,8 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="CPF*"
+                    label="CPF"
                     v-model="cpfForm"
-                    :rules="cpfRule"
                     v-mask="'###.###.###-##'"
                     clearable
                   ></v-text-field>
@@ -105,10 +103,8 @@ export default {
   data() {
     return {
       valid: false,
-      nomeRule: [(v) => !!v || "Nome é Obrigatório"],
-      emailRule: [(v) => !!v || "E-mail é obrigatório"],
-      telefoneRule: [(v) => !!v || "Telefone é obrigatório"],
-      cpfRule: [(v) => !!v || "CPF é obrigatório"],
+      nomeRule: [(v) => !!v || "Nome é Obrigatório"],      
+      telefoneRule: [(v) => !!v || "Telefone é obrigatório"],      
       codigoForm: "0",
       nomeForm: "",
       emailForm: "",
@@ -174,14 +170,14 @@ export default {
         .then(() => {
           if (this.codigoForm == "0" || this.codigoForm == "") {
             let payload = {
-              message: "Cliente criado com sucesso!",
+              message: "Comprador criado com sucesso!",
               color: "success",
             };
             this.alertaParaUsuario(payload);
             this.fechar();
           } else {
             let payload = {
-              message: "Cliente alterado com sucesso!",
+              message: "Comprador alterado com sucesso!",
               color: "success",
             };
             this.alertaParaUsuario(payload);
@@ -191,7 +187,7 @@ export default {
         .catch((error) => {
           if (error) {
             let payload = {
-              message: "Ocorreu um erro ao carregar os dados do cliente",
+              message: "Ocorreu um erro ao carregar os dados do Comprador",
               color: "error",
             };
             this.alertaParaUsuario(payload);
@@ -220,7 +216,7 @@ export default {
           .catch((error) => {
             if (error) {
               let payload = {
-                message: "Ocorreu um erro ao carregar os dados do cliente",
+                message: "Ocorreu um erro ao carregar os dados do Comprador",
                 color: "error",
               };
               this.alertaParaUsuario(payload);

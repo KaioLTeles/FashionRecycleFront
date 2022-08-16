@@ -1,6 +1,7 @@
 import RelatorioVendasPage from "@/pages/Relatorios/RelatorioVendasPage";
 import RelatorioFluxoCaixaPage from "@/pages/Relatorios/RelatorioFluxoCaixaPage";
 import RelatorioContasPagar from "@/pages/Relatorios/RelatorioContasPagar";
+import RelatorioContasReceber from "@/pages/Relatorios/RelatorioContasReceber";
 
 const routes = {
   RelatorioDeVendas: {
@@ -21,6 +22,13 @@ const routes = {
     path: "/relatorios/relatorio-fluxo-caixa",
     name: "RelatorioDeFluxoDeCaixa",
     component: RelatorioFluxoCaixaPage,
+    meta: { requiresAuth: true },
+    show: true,
+  },
+  RelatorioDeContasAReceber: {
+    path: "/relatorios/relatorio-contas-receber",
+    name: "RelatorioDeContasAReceber",
+    component: RelatorioContasReceber,
     meta: { requiresAuth: true },
     show: true,
   },

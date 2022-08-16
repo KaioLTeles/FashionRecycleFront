@@ -27,7 +27,9 @@ import {
     GET_PAPEIS_VENDEDORES,
     ESQUECI_MINHA_SENHA_ROUTE,
     ESQUECI_MINHA_SENHA_MATRICULA_EMAIL,
-    GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO
+    GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO,
+    BUSCARTODOSOSUSUARIOS,
+    BUSCARUSERPELOID
 } from '@/store/types/UsuarioType'
 
 // import { RESET_STATE_APROVACAO } from '@/store/types/AprovacaoType'
@@ -54,27 +56,15 @@ const getDefaultState = () => {
         getPapeisVendedoresListDt: [],
         esqueciMinhaSenhaRouteResponse: null,
         esqueciMinhaSenhaMatriculaEmail: null,
-        supervisoresPorOrganizacao: []
+        supervisoresPorOrganizacao: [],
+        listaTodosOsUsuarios: [],
+        usuarioObj: {}
     }
 }
 
 const state = getDefaultState()
 
-const getters = {
-    temAtribuicao: state => atribuicao => {
-        const result = state.Autenticado && state.usuario.atribuicoes.indexOf(atribuicao) > -1
-        return result
-    },
-    getListaUsuarioRAResult: state => {
-        return state.listaUsuarioRAResult
-    },
-    getListaUsuarioResponsavelRAResult: state => {
-        return state.listaUsuarioResponsavelRAResult
-    },
-    getAllAtribuicoesByUsuario: state => {
-        return state.usuario.atribuicoes
-    }
-}
+const getters = {}
 
 const mutations = {
     [AUTENTICAR](state, response) {              
@@ -125,6 +115,12 @@ const mutations = {
     },
     [GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO](state, response) {
         state.supervisoresPorOrganizacao = response
+    },
+    [BUSCARTODOSOSUSUARIOS](state, response) {
+        state.listaTodosOsUsuarios = response
+    },
+    [BUSCARUSERPELOID](state, response) {
+        state.usuarioObj = response
     }
 }
 
@@ -232,6 +228,16 @@ const actions = {
     async [GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO](context, payload) {
         return UsuarioApi.getPapeisSupervisoresByOrganizacao(payload).then(response => {
             context.commit(GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO, response.data)
+        })
+    },
+    async [BUSCARTODOSOSUSUARIOS](context, payload) {
+        return UsuarioApi.buscaTodosUsuarios(payload).then(response => {
+            context.commit(BUSCARTODOSOSUSUARIOS, response.data)
+        })
+    },
+    async [BUSCARUSERPELOID](context, payload) {
+        return UsuarioApi.buscarUsuarioPeloId(payload).then(response => {
+            context.commit(BUSCARUSERPELOID, response.data)
         })
     }
 }

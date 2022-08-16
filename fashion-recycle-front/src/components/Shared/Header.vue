@@ -71,7 +71,7 @@
             <v-list-item to="/cadastros/clientes">
               <v-list-item-content>
                 <v-list-item-title class="wrap-text"
-                  >Cadastro Cliente</v-list-item-title
+                  >Cadastro Comprador</v-list-item-title
                 >
               </v-list-item-content>
             </v-list-item>
@@ -137,6 +137,14 @@
               <v-list-item-content>
                 <v-list-item-title class="wrap-text"
                   >Relatório de Contas a Pagar</v-list-item-title
+                >
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item to="/relatorios/relatorio-contas-receber">
+              <v-list-item-content>
+                <v-list-item-title class="wrap-text"
+                  >Relatório de Contas a Receber</v-list-item-title
                 >
               </v-list-item-content>
             </v-list-item>

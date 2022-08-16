@@ -29,6 +29,7 @@ const CriarOuAlterarPagamento = async function (payload) {
     amount: payload.amount,
     paymentDate: payload.paymentDate,
     paymentMade: payload.paymentMade,
+    recurringPayment: payload.recurringPayment
   });
 };
 

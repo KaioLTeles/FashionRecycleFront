@@ -178,6 +178,24 @@ const getUsuariosByOrganizacao = async organizacao => {
     return await API.get(`/usuario/getUsuariosByOrganizacao?organizacao=${organizacao}`)
 }
 
+const buscaTodosUsuarios = async function(payload) {
+    return API.get('/user/getAllUserByFilter', {
+        params: {
+            name: payload.name,
+            email: payload.email
+        }
+    })
+}
+
+const buscarUsuarioPeloId = async function(payload) {
+    return API.get('/user/getuser', {
+        params: {
+            id: payload.id,
+        }
+    })
+}
+
+
 export const UsuarioApi = {
     autenticar,
     verificaExisteMatricula,
@@ -203,5 +221,7 @@ export const UsuarioApi = {
     deleteUsuarioPapelFromComercial,
     getUsuariosByOrganizacaoToBeAddedInPapel,
     getUsuariosByOrganizacao,
-    getPapeisSupervisoresByOrganizacao
+    getPapeisSupervisoresByOrganizacao,
+    buscaTodosUsuarios,
+    buscarUsuarioPeloId
 }
