@@ -37,10 +37,28 @@ const RemoverPagamentos = async function (payload) {
   return API.delete("/payment/removePayment/" + payload);
 };
 
+
+//RECEBIMENTO
+const BuscarTodosRecebimentos = async function (payload) {
+  return API.get("/Recievables/getListReceiablesAll", {
+    params: {
+      inicialDate: payload.inicialDate,
+      finalDate: payload.finalDate,
+      idClient: payload.idClient
+    },
+  });
+};
+
+const AlterarRecebimento = async function (payload) {
+  return API.post("/Recievables/updateReceievalbe/"+ payload);
+};
+
 export const PagamentosApi = {
   BuscarMargemPadrao,
   BuscarTodosPagamentoAtivos,
   BuscarPagamentoPorId,
   CriarOuAlterarPagamento,
   RemoverPagamentos,
+  BuscarTodosRecebimentos,
+  AlterarRecebimento
 };

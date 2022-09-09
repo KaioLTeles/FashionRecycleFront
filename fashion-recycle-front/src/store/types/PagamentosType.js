@@ -3,6 +3,9 @@ export const BUSCARTODOSPAGAMENTOSATIVOS = "getListPaymentsAll";
 export const BUSCARPAGAMENTOPORID = "getPaymentById";
 export const CRIAROUALTERARPAGAMENTO = "alterOrCreatePayment";
 export const REMOVERPAGAMENTO = "removePayment";
+//RECEBIMENTO
+export const BUSCARTODOSRECEBIMENTOS = "getListReceiablesAll";
+export const ALTERARRECEBIMENTO = "AlterarRecebimento";
 
 export default {
   BUSCARMARGEMPADRAO,
@@ -10,4 +13,6 @@ export default {
   BUSCARPAGAMENTOPORID,
   CRIAROUALTERARPAGAMENTO,
   REMOVERPAGAMENTO,
+  BUSCARTODOSRECEBIMENTOS,
+  ALTERARRECEBIMENTO
 };

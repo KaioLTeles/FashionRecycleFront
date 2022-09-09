@@ -62,12 +62,15 @@
             </v-menu>
           </v-col>
         </v-row>
-         <v-row>
-          <v-col cols="6">
+        <v-row>
+          <v-col cols="4">
             <v-checkbox v-model="checkEntradas" label="Somente Entradas" />
           </v-col>
-          <v-col cols="6">
+          <v-col cols="4">
             <v-checkbox v-model="checkSaidas" label="Somente Saidas" />
+          </v-col>
+          <v-col cols="4">
+            <v-checkbox v-model="somenteRealizado" label="Somente Realizado" />
           </v-col>
         </v-row>
         <v-card-actions>
@@ -75,7 +78,7 @@
           <BtnExportToXlsx
             :dataExport="listaItensExport"
             :columnsExport="headersXlsExport"
-            :fileName="rel_fluxo_caixa_nome"
+            fileName="rel_fluxo_caixa"
             sheetName="FluxoCaixa"
             :loadingToExport="loadingExport"
           ></BtnExportToXlsx>
@@ -90,7 +93,7 @@
           item-key="codigo"
           :loading="loadingDataTable"
           :items="listaRelFluxoCaixa"
-        >          
+        >
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -110,7 +113,7 @@ export default {
         { text: "Data", value: "rowDateText" },
         { text: "Entradas", value: "valueRevenue" },
         { text: "Saidas", value: "valueExpense" },
-        { text: "Saldo", value: "balance" },        
+        { text: "Saldo", value: "balance" },
       ],
       headersXlsExport: [
         { label: "Data", field: "rowDateText" },
@@ -122,7 +125,10 @@ export default {
       loadingDataTable: false,
       loadingParceiros: false,
       checkEntradas: true,
+      loadingExport: false,
+      listaItensExport: [],
       checkSaidas: true,
+      somenteRealizado: false,
       dateInicial: {
         todayDate: new Date().toISOString().substr(0, 10),
         initialMenuDate: false,
@@ -142,6 +148,7 @@ export default {
         finalDate: this.dateFinal.initialDate,
         onlyRevenue: this.checkEntradas,
         onlyExpense: this.checkSaidas,
+        realFlow: this.somenteRealizado,
       };
 
       this.loadingDataTable = true;
@@ -153,6 +160,7 @@ export default {
         .dispatch(BUSCARRELATORIOFLUXOCAIXA, payload)
         .then(() => {
           this.loadingDataTable = false;
+          this.listaItensExport = this.listaRelFluxoCaixa
         })
         .catch((error) => {
           if (error) {
@@ -179,7 +187,6 @@ export default {
     },
   },
   created() {
-    this.buscarListaDeParceiros();
   },
   computed: {
     initialDateFormatted: {

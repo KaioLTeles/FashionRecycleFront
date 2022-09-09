@@ -163,6 +163,7 @@ export default {
         { text: "Produto", value: "productDesciption" },
         { text: "Total da Venda", value: "amountSale" },
         { text: "Forma de Pagamento", value: "paymentMethod" },
+        { text: "Numero de Parcelas", value: "numberInstallments" },
       ],
       mostrarJanela: false,
       loadingDataTable: false,

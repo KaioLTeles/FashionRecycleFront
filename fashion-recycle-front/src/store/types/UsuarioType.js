@@ -27,6 +27,8 @@ export const GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO = 'getPapeisSupervisoresByOr
 export const BUSCARTODOSOSUSUARIOS = 'getAllUserByFilter'
 export const BUSCARUSERPELOID = 'getuser'
 export const EMPTYUSER = 'limpauser'
+export const CRIARUSUARIO = 'createUser'
+export const ALTERARUSUARIO = 'alterarUsuario'
 
 export default {
     AUTENTICAR,
@@ -57,5 +59,7 @@ export default {
     GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO,
     BUSCARTODOSOSUSUARIOS,
     BUSCARUSERPELOID,
-    EMPTYUSER
+    EMPTYUSER,
+    CRIARUSUARIO,
+    ALTERARUSUARIO
 }

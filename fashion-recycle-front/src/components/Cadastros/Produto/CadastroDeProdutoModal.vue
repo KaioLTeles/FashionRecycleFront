@@ -21,7 +21,7 @@
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
-                    label="Data Criação"
+                    label="Data de Entrada"
                     v-model="dataCriacaoForm"
                     disabled
                     clearable
@@ -389,7 +389,7 @@ export default {
   watch: {
     precoVendaForm() {
       this.margemForm =
-        ((this.precoVendaForm - this.precoParceiroForm) / this.precoVendaForm) *
+        ((this.precoVendaForm - this.precoParceiroForm) / this.precoParceiroForm) *
         100;
     },
   },

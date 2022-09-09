@@ -85,11 +85,8 @@
               >mdi-pencil</v-icon
             >
           </template>
-          <template v-slot:[`item.active`]="{ item }">
-            <v-simple-checkbox
-              v-model="item.active"
-              disabled
-            ></v-simple-checkbox>
+          <template v-slot:[`item.paymentMade`]="{ item }">
+             {{ item.paymentMade == true ? "Liquidado" : "Em Aberto" }}
           </template>
         </v-data-table>
       </v-card-text>
@@ -119,6 +116,7 @@ export default {
         { text: "Classificação", value: "paymenyType.description" },
         { text: "Valor", value: "amount" },
         { text: "Data Vencimento", value: "paymentDateFormated" },
+        { text: "Status", value: "paymentMade" },
         { text: "Ações", value: "action", sortable: false },
       ],
       codigoFilter: "",

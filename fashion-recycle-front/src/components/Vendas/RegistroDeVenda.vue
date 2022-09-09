@@ -7,7 +7,7 @@
       <v-divider></v-divider>
       <v-card-text>
         <v-row>
-          <v-col>
+          <v-col cols="4">
             <v-autocomplete
               dense
               label="Comprador"
@@ -20,17 +20,28 @@
               :loading="loadingCampoCliente"
             ></v-autocomplete>
           </v-col>
-          <v-col>
+          <v-col cols="4">
             <v-autocomplete
               dense
               label="Forma de Pagamento"
               :items="formasPagamento"
               item-value="Codigo"
               item-text="Descricao"
-              return-object
               v-model="formaPagamentoFilter"
               clearable
+              return-object
             ></v-autocomplete>
+          </v-col>
+          <v-col cols="4">
+            <v-select
+              dense
+              label="Nª de Parcelas"
+              :items="listaDeParcelas"
+              item-value="Codigo"
+              item-text="Descricao"
+              v-show="showParcelas"
+              v-model="parcelasFilter"
+            ></v-select>
           </v-col>
         </v-row>
       </v-card-text>
@@ -154,7 +165,7 @@
                   <td>PEDIDO DE VENDA Nº {{ codigoVendaCriado }}</td>
                 </tr>
                 <tr>
-                  <td>CLIENTE: {{ clienteFilter.name }}</td>
+                  <td>COMPRADOR: {{ clienteFilter.name }}</td>
                 </tr>
                 <tr>
                   <td>
@@ -183,7 +194,7 @@
                 <tr>
                   <th>Qnt</th>
                   <th>Produto</th>
-                  <th>Preço</th>
+                  <th>Valor</th>
                 </tr>
               </thead>
               <tbody>
@@ -248,6 +259,8 @@ export default {
       dialogSaving: false,
       vendaCriadaResult: false,
       today: new Date(),
+      parcelasFilter: 0,
+      showParcelas: false,
     };
   },
   methods: {
@@ -316,13 +329,20 @@ export default {
           color: "warning",
         };
         this.alertaParaUsuario(payload);
+      } else if ((this.formaPagamentoFilter.Codigo == 4 || this.formaPagamentoFilter.Codigo == 5) && this.parcelasFilter == 0) {
+        let payload = {
+          message: "Favor inserir o número de parcelas!",
+          color: "warning",
+        };
+        this.alertaParaUsuario(payload);
       } else {
         let payload = {
           sale: {
             IdClient: this.clienteFilter.id,
             AmountSale: this.valorDoPedido,
             IdPaymentMethod: this.formaPagamentoFilter.Codigo,
-            Observation: "Teste",
+            Observation: "Teste",      
+            NumberInstallments: this.parcelasFilter
           },
           saleItems: [],
         };
@@ -332,7 +352,7 @@ export default {
             IdProduct: element.idProduto,
             IdPartner: element.idParceiro,
             PriceSale: element.precoDevenda,
-            Amount: element.quantidade,
+            Amount: element.quantidade,            
           };
           payload.saleItems.push(item);
         });
@@ -390,6 +410,12 @@ export default {
       } else {
         this.adicionarProdutoDisable = false;
       }
+
+      if (newValue.Codigo == 4 || newValue.Codigo == 5) {
+        this.showParcelas = true;
+      } else {
+        this.showParcelas = false;
+      }
     },
     itemsVenda() {
       if (this.itemsVenda.length > 0) {
@@ -406,7 +432,7 @@ export default {
   computed: {
     formasPagamento() {
       let array = [
-        { Codigo: 1, Descricao: "BOLETO" },
+        { Codigo: 5, Descricao: "CHEQUE" },
         { Codigo: 2, Descricao: "CARTÃO CRÉDITO" },
         { Codigo: 3, Descricao: "CARTÃO DÉBITO" },
         { Codigo: 4, Descricao: "TRANSFERÊNCIA/PIX" },
@@ -421,6 +447,23 @@ export default {
     },
     codigoVendaCriado() {
       return this.$store.state.VendasStore.codigoVendaCriada;
+    },
+    listaDeParcelas() {
+      let array = [
+        { Codigo: 0, Descricao: "-" },
+        { Codigo: 1, Descricao: "1x" },
+        { Codigo: 2, Descricao: "2x" },
+        { Codigo: 3, Descricao: "3x" },
+        { Codigo: 4, Descricao: "4x" },
+        { Codigo: 5, Descricao: "5x" },
+        { Codigo: 6, Descricao: "6x" },
+        { Codigo: 7, Descricao: "7x" },
+        { Codigo: 8, Descricao: "8x" },
+        { Codigo: 9, Descricao: "10x" },
+        { Codigo: 10, Descricao: "11x" },
+        { Codigo: 11, Descricao: "12x" },
+      ];
+      return array;
     },
   },
 };

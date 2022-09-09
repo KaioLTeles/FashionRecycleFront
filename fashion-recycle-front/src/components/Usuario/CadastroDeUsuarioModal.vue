@@ -15,7 +15,7 @@
                   <v-text-field
                     label="Usuario"
                     v-model="usuarioForm"
-                    disabled
+                    :disabled="disableOn"
                     clearable
                   ></v-text-field>
                 </v-col>
@@ -34,6 +34,16 @@
                     :rules="emailRule"
                     clearable
                   ></v-text-field>
+                </v-col>
+                <v-col cols="12">
+                  <v-select
+                    dense
+                    label="Nivel de Acesso"
+                    :items="listaDePapeis"
+                    item-value="Codigo"
+                    item-text="Descricao"
+                    v-model="nivelDeAcessoForm"                                        
+                  ></v-select>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
@@ -73,7 +83,7 @@
 </template>
 
 <script>
-import { BUSCARUSERPELOID, EMPTYUSER } from "@/store/types/UsuarioType";
+import { BUSCARUSERPELOID, EMPTYUSER, CRIARUSUARIO, ALTERARUSUARIO } from "@/store/types/UsuarioType";
 
 import { SET_MESSAGE } from "@/store/types/NotificationType";
 
@@ -90,7 +100,9 @@ export default {
       novaSenhaForm: "",
       novaSenhaConfirmForm: "",
       ativoForm: true,
-      showPassword: false
+      showPassword: false,
+      nivelDeAcessoForm: 1,
+      disableOn: true
     };
   },
   computed: {
@@ -105,6 +117,13 @@ export default {
     },
     UsuarioSelecionado() {
       return this.$store.state.UsuarioStore.usuarioObj;
+    },
+    listaDePapeis() {
+      let array = [
+        { Codigo: 1, Descricao: "Padrão" },
+        { Codigo: 2, Descricao: "Administrador" },
+      ];
+      return array;
     },
   },
   methods: {
@@ -127,7 +146,7 @@ export default {
           this.novaSenhaConfirmForm != undefined
         ) {
           if (this.novaSenhaForm == this.novaSenhaConfirmForm) {
-            this.gravarParceiro();
+            this.gravarUsuario();
           } else {
             let payload = {
               message: "As senhas estão diferentes!",
@@ -135,6 +154,9 @@ export default {
             };
             this.alertaParaUsuario(payload);
           }
+        }
+        else{
+          this.gravarUsuario();
         }
       } else {
         let payload = {
@@ -144,12 +166,93 @@ export default {
         this.alertaParaUsuario(payload);
       }
     },
-    gravarParceiro() {},
+    gravarUsuario() {
+      if (this.codigoUsuario == 0 && this.usuarioForm == "") {
+        let payload = {
+          message: "Favor preencher o nome de usuario!",
+          color: "warning",
+        };
+        this.alertaParaUsuario(payload);
+      }
+      else{
+        if (this.codigoUsuario == 0){
+          this.criarUsuario()
+        }
+        else{
+          this.alterarUsuario()
+        }
+        
+      }
+
+    },
+    alterarUsuario(){
+      let payload = { 
+          idUser: this.codigoUsuario,                  
+          email: this.emailForm,
+          name: this.nomeForm,
+          userName: this.usuarioForm,
+          password: this.novaSenhaForm,          
+          roleId: this.nivelDeAcessoForm,
+          active: this.ativoForm          
+        }
+
+        this.$store
+          .dispatch(ALTERARUSUARIO, payload)
+          .then(() => {
+            this.fechar();
+            let payload = {
+                message: "Usuario alterado com sucesso!",
+                color: "success",
+              };
+              this.alertaParaUsuario(payload);
+          })
+          .catch((error) => {
+            if (error) {
+              let payload = {
+                message: "Ocorreu um erro ao alterar o usuario",
+                color: "error",
+              };
+              this.alertaParaUsuario(payload);
+            }
+          });
+    },
+    criarUsuario(){
+      let payload = {
+          UserName: this.usuarioForm,
+          Password: this.novaSenhaForm,
+          Name: this.nomeForm,
+          Email: this.emailForm,
+          RoleId: this.nivelDeAcessoForm
+        }
+
+        this.$store
+          .dispatch(CRIARUSUARIO, payload)
+          .then(() => {
+            this.fechar();
+            let payload = {
+                message: "Usuario criado com sucesso!",
+                color: "success",
+              };
+              this.alertaParaUsuario(payload);
+          })
+          .catch((error) => {
+            if (error) {
+              let payload = {
+                message: "Ocorreu um erro ao criar o usuario",
+                color: "error",
+              };
+              this.alertaParaUsuario(payload);
+            }
+          });
+    },
     alertaParaUsuario(payload) {
       this.$store.commit(SET_MESSAGE, payload);
     },
     async buscarParceiro() {
       if (this.codigoUsuario != 0) {
+
+        this.disableOn = true
+
         let payload = {
           id: this.codigoUsuario,
         };
@@ -169,22 +272,21 @@ export default {
             }
           });
       }
+      else{
+        this.disableOn = false
+      }      
     },
     carregarDadosForm() {
       this.usuarioForm = this.UsuarioSelecionado.userName;
       this.nomeForm = this.UsuarioSelecionado.name;
       this.emailForm = this.UsuarioSelecionado.email;
       this.ativoForm = this.UsuarioSelecionado.active;
+      this.nivelDeAcessoForm = this.UsuarioSelecionado.roleId;
     },
     limparCamposForm() {
-      this.codigoForm = 0;
+      this.usuarioForm = "";
       this.nomeForm = "";
-      this.emailForm = "";
-      this.telefoneForm = "";
-      this.cpfForm = "";
-      this.enderecoForm = "";
-      this.numeroForm = "";
-      this.cepForm = "";
+      this.emailForm = "";            
       this.ativoForm = false;
     },
   },

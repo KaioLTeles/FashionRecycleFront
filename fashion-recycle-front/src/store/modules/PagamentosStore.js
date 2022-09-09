@@ -9,6 +9,8 @@ import {
   BUSCARPAGAMENTOPORID,
   CRIAROUALTERARPAGAMENTO,
   REMOVERPAGAMENTO,
+  BUSCARTODOSRECEBIMENTOS,
+  ALTERARRECEBIMENTO,
 } from "@/store/types/PagamentosType";
 
 Vue.use(Vuex);
@@ -18,6 +20,7 @@ const getDefaultState = () => {
     margemPadrao: 0,
     listPagamentos: [],
     pagamentoObj: {},
+    listRecebimento: []
   };
 };
 
@@ -34,6 +37,9 @@ const mutations = {
   },
   [BUSCARPAGAMENTOPORID](state, response) {
     state.pagamentoObj = response;
+  },
+  [BUSCARTODOSRECEBIMENTOS](state, response) {
+    state.listRecebimento = response;
   },
 };
 
@@ -60,6 +66,15 @@ const actions = {
   },
   async [REMOVERPAGAMENTO](context, payload) {
     return PagamentosApi.RemoverPagamentos(payload);
+  },
+  async [BUSCARTODOSRECEBIMENTOS](context, payload) {
+    return PagamentosApi.BuscarTodosRecebimentos(payload).then((response) => {
+      context.commit(BUSCARTODOSRECEBIMENTOS, response.data);
+    });
+  },
+  async [ALTERARRECEBIMENTO](context, payload) {
+    return PagamentosApi.AlterarRecebimento(payload).then(() => {
+    });
   },
 };
 

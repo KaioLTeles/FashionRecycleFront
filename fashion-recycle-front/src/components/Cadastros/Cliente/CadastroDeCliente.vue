@@ -12,7 +12,7 @@
               dense
               v-model="codigoClienteFilter"
               type="number"
-              label="Codigo Cliente"
+              label="Codigo Comprador"
               clearable
             ></v-text-field>
           </v-col>
@@ -20,7 +20,7 @@
             <v-text-field
               dense
               v-model="nomeClienteFilter"
-              label="Nome Cliente"
+              label="Nome Comprador"
               clearable
             ></v-text-field>
           </v-col>

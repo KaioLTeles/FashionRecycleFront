@@ -29,7 +29,10 @@ import {
     ESQUECI_MINHA_SENHA_MATRICULA_EMAIL,
     GET_PAPEIS_SUPERVISORES_BY_ORGANIZACAO,
     BUSCARTODOSOSUSUARIOS,
-    BUSCARUSERPELOID
+    BUSCARUSERPELOID,
+    EMPTYUSER,
+    CRIARUSUARIO,
+    ALTERARUSUARIO
 } from '@/store/types/UsuarioType'
 
 // import { RESET_STATE_APROVACAO } from '@/store/types/AprovacaoType'
@@ -121,6 +124,9 @@ const mutations = {
     },
     [BUSCARUSERPELOID](state, response) {
         state.usuarioObj = response
+    },
+    [EMPTYUSER](state) {
+        state.usuarioObj = {}
     }
 }
 
@@ -238,6 +244,16 @@ const actions = {
     async [BUSCARUSERPELOID](context, payload) {
         return UsuarioApi.buscarUsuarioPeloId(payload).then(response => {
             context.commit(BUSCARUSERPELOID, response.data)
+        })
+    },    
+    async [CRIARUSUARIO](context, payload) {
+        console.log(payload)
+        return UsuarioApi.criarUsuario(payload).then(() => {
+        })
+    },    
+    async [ALTERARUSUARIO](context, payload) {
+        console.log(payload)
+        return UsuarioApi.alterarUsuario(payload).then(() => {
         })
     }
 }

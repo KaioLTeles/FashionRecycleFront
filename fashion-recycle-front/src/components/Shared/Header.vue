@@ -79,7 +79,7 @@
             <v-list-item to="/cadastros/parceiros">
               <v-list-item-content>
                 <v-list-item-title class="wrap-text"
-                  >Cadastro De Fornecedor</v-list-item-title
+                  >Cadastro Fornecedor</v-list-item-title
                 >
               </v-list-item-content>
             </v-list-item>
@@ -95,7 +95,7 @@
 
           <v-list-item to="/vendas">
             <v-list-item-action>
-              <v-icon color="sidebarcolor">mdi-currency-usd </v-icon>
+              <v-icon color="sidebarcolor">mdi-cash-multiple</v-icon>
             </v-list-item-action>
 
             <v-list-item-content>
@@ -111,6 +111,18 @@
             <v-list-item-content>
               <v-list-item-title class="wrap-text"
                 >Contas Pagar</v-list-item-title
+              >
+            </v-list-item-content>
+          </v-list-item>
+
+          <v-list-item to="/recebimentos">
+            <v-list-item-action>
+              <v-icon color="sidebarcolor">mdi-currency-usd </v-icon>
+            </v-list-item-action>
+
+            <v-list-item-content>
+              <v-list-item-title class="wrap-text"
+                >Contas Receber</v-list-item-title
               >
             </v-list-item-content>
           </v-list-item>
@@ -149,7 +161,7 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item to="/relatorios/relatorio-fluxo-caixa">
+            <v-list-item to="/relatorios/relatorio-fluxo-caixa" v-show="this.idPapelUsuario==2">
               <v-list-item-content>
                 <v-list-item-title class="wrap-text"
                   >Relatório de Fluxo de Caixa</v-list-item-title
@@ -157,7 +169,7 @@
               </v-list-item-content>
             </v-list-item>
           </v-list-group>
-          <v-list-item to="/usuarios">
+          <v-list-item to="/usuarios" v-show="this.idPapelUsuario==2">
             <v-list-item-action>
               <v-icon color="sidebarcolor">mdi-cog-outline </v-icon>
             </v-list-item-action>
@@ -216,6 +228,7 @@ export default {
       isMobile: false,
       cadastrosGroup: false,
       relatorioGroup: false,
+      idPapelUsuario: 0,
     };
   },
   methods: {
@@ -240,7 +253,7 @@ export default {
       this.relatorioGroup = false;
     },
   },
-  watch: {},
+  watch: {},  
   computed: {
     autenticado() {
       return this.$store.state.UsuarioStore.Autenticado;
@@ -278,6 +291,14 @@ export default {
         passive: true,
       });
     }
+  },
+  created(){
+
+    const usuarioStr = localStorage.getItem('usuario')
+
+    const usuario = JSON.parse(usuarioStr)
+
+    this.idPapelUsuario = usuario.roleUser
   },
   mounted() {
     this.onResize();

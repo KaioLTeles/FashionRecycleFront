@@ -192,7 +192,17 @@ const buscarUsuarioPeloId = async function(payload) {
         params: {
             id: payload.id,
         }
-    })
+    })    
+}
+
+const criarUsuario = async payload => {
+    const response = API.post('/user/createUser', payload)
+    return response
+}
+
+const alterarUsuario = async payload => {
+    const response = API.post('/user/alterUser', payload)
+    return response
 }
 
 
@@ -223,5 +233,7 @@ export const UsuarioApi = {
     getUsuariosByOrganizacao,
     getPapeisSupervisoresByOrganizacao,
     buscaTodosUsuarios,
-    buscarUsuarioPeloId
+    buscarUsuarioPeloId,
+    criarUsuario,
+    alterarUsuario
 }

@@ -6,7 +6,8 @@ import { RelatoriosApi } from "@/api/RelatoriosApi";
 import {
   BUSCARRELATORIOVENDAS,
   BUSCARRELATORIODEPAGAMENTOS,
-  BUSCARRELATORIOFLUXOCAIXA
+  BUSCARRELATORIOFLUXOCAIXA,
+  BUSCARRELATORIOCONTASARECEBER
 } from "@/store/types/RelatorioType";
 
 Vue.use(Vuex);
@@ -16,6 +17,7 @@ const getDefaultState = () => {
     relVendasList: [],
     relPagamentos: [],
     relFluxoCaixa: [],
+    relContasAReceber: [],
   };
 };
 
@@ -33,6 +35,9 @@ const mutations = {
   [BUSCARRELATORIOFLUXOCAIXA](state, response) {
     state.relFluxoCaixa = response;
   },
+  [BUSCARRELATORIOCONTASARECEBER](state, response) {
+    state.relContasAReceber = response;
+  },
 };
 
 const actions = {
@@ -49,6 +54,11 @@ const actions = {
   async [BUSCARRELATORIOFLUXOCAIXA](context, payload) {
     return RelatoriosApi.GetAllSalesForCashFlow(payload).then((response) => {
       context.commit(BUSCARRELATORIOFLUXOCAIXA, response.data);
+    });
+  },
+  async [BUSCARRELATORIOCONTASARECEBER](context, payload) {
+    return RelatoriosApi.BuscarRelatorioDeContasAReceber(payload).then((response) => {
+      context.commit(BUSCARRELATORIOCONTASARECEBER, response.data);
     });
   },
 };
