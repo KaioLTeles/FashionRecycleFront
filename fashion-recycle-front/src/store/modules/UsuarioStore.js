@@ -46,6 +46,7 @@ const getDefaultState = () => {
             email: ''
         },
         Autenticado: false,
+        PapelUsuario: 0,
         matricula: '',
         codigoRetorno: '',
         descricaoRetorno: '',
@@ -74,6 +75,7 @@ const mutations = {
         state.usuario.token = response.token        
         state.usuario.email = response.email
         state.Autenticado = true
+        state.PapelUsuario = response.roleUser
 
         API.defaults.headers.common['Authorization'] = `Bearer ${response.token}`
     },
@@ -90,6 +92,7 @@ const mutations = {
     [SAIR](state) {
         state.usuario = {}
         state.Autenticado = false
+        state.PapelUsuario = 0
         API.defaults.headers.common['Authorization'] = null
     },
     [RETORNAR_USUARIOS](state, listaUsuarios) {

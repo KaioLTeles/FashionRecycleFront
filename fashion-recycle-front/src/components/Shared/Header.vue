@@ -161,7 +161,10 @@
               </v-list-item-content>
             </v-list-item>
 
-            <v-list-item to="/relatorios/relatorio-fluxo-caixa" v-show="this.idPapelUsuario==2">
+            <v-list-item
+              to="/relatorios/relatorio-fluxo-caixa"
+              v-show="papelUsuario == 2"
+            >
               <v-list-item-content>
                 <v-list-item-title class="wrap-text"
                   >Relatório de Fluxo de Caixa</v-list-item-title
@@ -169,7 +172,7 @@
               </v-list-item-content>
             </v-list-item>
           </v-list-group>
-          <v-list-item to="/usuarios" v-show="this.idPapelUsuario==2">
+          <v-list-item to="/usuarios" v-show="papelUsuario == 2">
             <v-list-item-action>
               <v-icon color="sidebarcolor">mdi-cog-outline </v-icon>
             </v-list-item-action>
@@ -253,8 +256,11 @@ export default {
       this.relatorioGroup = false;
     },
   },
-  watch: {},  
+  watch: {},
   computed: {
+    papelUsuario() {
+      return this.$store.state.UsuarioStore.PapelUsuario;
+    },
     autenticado() {
       return this.$store.state.UsuarioStore.Autenticado;
     },
@@ -292,14 +298,8 @@ export default {
       });
     }
   },
-  created(){
-
-    const usuarioStr = localStorage.getItem('usuario')
-
-    const usuario = JSON.parse(usuarioStr)
-
-    this.idPapelUsuario = usuario.roleUser
-  },
+  created() {},
+  updated() {},
   mounted() {
     this.onResize();
     window.addEventListener("resize", this.onResize, { passive: true });

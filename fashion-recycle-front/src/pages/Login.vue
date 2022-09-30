@@ -1,6 +1,6 @@
 <template>
   <v-container class="fill-height" fluid style>
-    <v-row align="center" justify="center">
+    <v-row justify="center" class="posicionamento">
       <v-col cols="12" sm="8" md="4">
         <v-card width="400" class="mx-auto mt-10 elevation-12">
           <v-card-title class="justify-center">
@@ -44,8 +44,6 @@
 <script>
 import {
   AUTENTICAR,
-  /*ENVIA_CHAVE_ACESSO,
-    INSERE_MATRICULA,*/
   GET_SESSION_EXPIRED,
   SET_SESSION_EXPIRED,
 } from "@/store/types/UsuarioType";
@@ -125,8 +123,12 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 .link {
   color: #6d96bd !important;
+}
+
+.posicionamento {
+  padding-right: 20%;
 }
 </style>

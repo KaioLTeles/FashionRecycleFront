@@ -32,6 +32,7 @@
                     label="Item*"
                     v-model="nomeForm"
                     clearable
+                    :disabled="modoVisualizacao"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
@@ -39,18 +40,21 @@
                     label="Modelo*"
                     v-model="modeloForm"
                     clearable
+                    :disabled="modoVisualizacao"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
                     label="Número de Série"
                     v-model="serieForm"
+                    :disabled="modoVisualizacao"
                     clearable
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
                     label="Cor*"
+                    :disabled="modoVisualizacao"
                     v-model="corForm"
                     clearable
                   ></v-text-field>
@@ -62,6 +66,7 @@
                     :items="listaMarcas"
                     item-value="id"
                     item-text="name"
+                    :disabled="modoVisualizacao"
                     v-model="marcaForm"
                     clearable
                     :loading="loadingParceiros"
@@ -71,6 +76,7 @@
                   <v-textarea
                     label="Situação Do Produto*"
                     v-model="situacaoForm"
+                    :disabled="modoVisualizacao"
                   ></v-textarea>
                 </v-col>
                 <v-col cols="12">
@@ -81,6 +87,7 @@
                     item-value="id"
                     item-text="name"
                     v-model="parceiroForm"
+                    :disabled="modoVisualizacao"
                     clearable
                     :loading="loadingParceiros"
                   ></v-autocomplete>
@@ -90,8 +97,10 @@
                     dense
                     label="Status"
                     :items="listStatus"
+                    :disabled="modoVisualizacao"
                     item-value="id"
                     item-text="name"
+                    
                     v-model="statusForm"
                   ></v-select>
                 </v-col>
@@ -99,6 +108,7 @@
                   <v-text-field
                     label="Preço Fornecedor*"
                     v-model="precoParceiroForm"
+                    :disabled="modoVisualizacao"
                     type="number"
                     clearable
                   ></v-text-field>
@@ -107,6 +117,7 @@
                   <v-text-field
                     label="Preço Venda*"
                     v-model="precoVendaForm"
+                    :disabled="modoVisualizacao"
                     type="number"
                     clearable
                   ></v-text-field>
@@ -114,14 +125,14 @@
                 <v-col cols="12">
                   <v-text-field
                     label="Margem%"
-                    v-model="margemForm"
+                    v-model="margemForm"                    
                     disabled
                     type="number"
                     clearable
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
-                  <v-checkbox v-model="ativoForm" label="Ativo" />
+                  <v-checkbox v-model="ativoForm" label="Ativo" :disabled="modoVisualizacao"/>
                 </v-col>
               </v-row>
             </v-form>
@@ -130,7 +141,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn color="info" outlined @click.stop="fechar"> Cancelar </v-btn>
-          <v-btn @click="salvar()" dark color="btnPrimary">Salvar</v-btn>
+          <v-btn v-show="!modoVisualizacao" @click="salvar()" dark color="btnPrimary">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -151,7 +162,7 @@ import { BUSCARMARGEMPADRAO } from "@/store/types/PagamentosType";
 import { SET_MESSAGE } from "@/store/types/NotificationType";
 
 export default {
-  props: ["value", "codigoProduto"],
+  props: ["value", "codigoProduto", "modoVisualizacao"],
   data() {
     return {
       valid: false,
@@ -270,13 +281,13 @@ export default {
         colour: this.corForm,
         observation: this.situacaoForm,
         brandId: this.marcaForm,
-        margim: this.margemForm
+        margim: this.margemForm,
       };
-      console.log(payload)
+      console.log(payload);
       this.$store
         .dispatch(ALTERAROUCRIARPRODUTO, payload)
         .then(() => {
-          if (this.idBanco == "0" || this.idBanco == ""|| this.idBanco == 0) {
+          if (this.idBanco == "0" || this.idBanco == "" || this.idBanco == 0) {
             let payload = {
               message: "Produto criado com sucesso!",
               color: "success",
@@ -306,7 +317,7 @@ export default {
       this.$store.commit(SET_MESSAGE, payload);
     },
     async buscarProduto() {
-      console.log(this.codigoProduto)
+      console.log(this.codigoProduto);
       if (this.codigoProduto != 0) {
         console.log(this.codigoProduto);
         let payload = {
@@ -330,7 +341,7 @@ export default {
       } else {
         this.$store.commit(EMPTYPRODUTO);
         this.ativoForm = true;
-        this.statusForm = 1
+        this.statusForm = 1;
       }
     },
     async buscarListaDeParceiros() {
@@ -389,7 +400,8 @@ export default {
   watch: {
     precoVendaForm() {
       this.margemForm =
-        ((this.precoVendaForm - this.precoParceiroForm) / this.precoParceiroForm) *
+        ((this.precoVendaForm - this.precoParceiroForm) /
+          this.precoParceiroForm) *
         100;
     },
   },

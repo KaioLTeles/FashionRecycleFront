@@ -1,6 +1,6 @@
 <template>
   <v-container class="fill-height" fluid style>
-    <v-row align="center" justify="center">
+    <v-row justify="center" class="posicionamento">
       <img width="250" height="250" src="@/assets/logo.png" />
       <img />
     </v-row>
@@ -15,4 +15,8 @@ export default {
   },
 };
 </script>
-<style></style>
+<style scoped>
+  .posicionamento {
+    padding-right: 30%;
+  }
+</style>

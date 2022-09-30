@@ -66,6 +66,11 @@
               >mdi-pencil</v-icon
             >
           </template>
+          <template v-slot:[`item.action2`]="{ item }">
+            <v-icon color="btnPrimary" @click.stop="verProduto(item)"
+              >mdi-eye</v-icon
+            >
+          </template>
           <template v-slot:[`item.active`]="{ item }">
             <v-simple-checkbox
               v-model="item.active"
@@ -78,6 +83,7 @@
     <CadastroDeProdutoModal
       v-model="mostrarJanela"
       :codigoProduto="codigoProduto"
+      :modoVisualizacao="modoVisualizacao"
       @resetarCodigoProduto="resetarCodigoProduto"
     />
     <CadastroDeMarcas v-model="mostrarJanelaMarca" />
@@ -112,7 +118,8 @@ export default {
         { text: "Data da Entrada", value: "creationDateFormat" },
         { text: "Status", value: "productStatusDescription" },
         { text: "Ativo", value: "active" },
-        { text: "Ações", value: "action", sortable: false },
+        { text: "Alterar", value: "action", sortable: false },
+        { text: "Visualização", value: "action2", sortable: false },
       ],
       mostrarJanela: false,
       mostrarJanelaMarca: false,
@@ -169,6 +176,11 @@ export default {
     alterarProduto(item) {
       this.codigoProduto = item.id;
       this.mostrarJanela = true;
+    },    
+    verProduto(item) {
+      this.modoVisualizacao = true;
+      this.codigoProduto = item.id;
+      this.mostrarJanela = true;
     },
     gerenciarMarcas() {
       console.log("Entrou na função");
@@ -194,6 +206,7 @@ export default {
     },
     resetarCodigoProduto() {
       this.codigoProduto = 0;
+      this.modoVisualizacao = false;
     },
     alertaParaUsuario(payload) {
       this.$store.commit(SET_MESSAGE, payload);
