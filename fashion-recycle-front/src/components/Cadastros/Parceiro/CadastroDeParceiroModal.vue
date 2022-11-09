@@ -231,6 +231,7 @@ export default {
               color: "success",
             };
             this.alertaParaUsuario(payload);
+            this.$emit("pesquisar");
             this.fechar();
           } else {
             let payload = {
@@ -238,6 +239,7 @@ export default {
               color: "success",
             };
             this.alertaParaUsuario(payload);
+            this.$emit("pesquisar");
             this.fechar();
           }
         })

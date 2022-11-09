@@ -4,7 +4,7 @@
       :app="!isMobile ? true : false"
       :clipped-left="!isMobile ? true : false"
       v-show="autenticado"
-      color="toolbarcolor"
+      color="#757575"
       dark
       class="appbar"
     >
@@ -48,7 +48,7 @@
         <v-list dense nav class="wrap-text">
           <v-list-item to="/" style="font-size: 1px">
             <v-list-item-action color="primary">
-              <v-icon color="primary">mdi-home</v-icon>
+              <v-icon color="#757575">mdi-home</v-icon>
             </v-list-item-action>
 
             <v-list-item-content>
@@ -60,7 +60,7 @@
           <v-list-group v-model="cadastrosGroup">
             <template v-slot:activator>
               <v-list-item-action>
-                <v-icon color="sidebarcolor"
+                <v-icon color="#757575"
                   >mdi-clipboard-check-multiple</v-icon
                 >
               </v-list-item-action>
@@ -95,7 +95,7 @@
 
           <v-list-item to="/vendas">
             <v-list-item-action>
-              <v-icon color="sidebarcolor">mdi-cash-multiple</v-icon>
+              <v-icon color="#757575">mdi-cash-multiple</v-icon>
             </v-list-item-action>
 
             <v-list-item-content>
@@ -105,7 +105,7 @@
 
           <v-list-item to="/pagamentos">
             <v-list-item-action>
-              <v-icon color="sidebarcolor">mdi-currency-usd-off </v-icon>
+              <v-icon color="#757575">mdi-currency-usd-off </v-icon>
             </v-list-item-action>
 
             <v-list-item-content>
@@ -117,7 +117,7 @@
 
           <v-list-item to="/recebimentos">
             <v-list-item-action>
-              <v-icon color="sidebarcolor">mdi-currency-usd </v-icon>
+              <v-icon color="#757575">mdi-currency-usd </v-icon>
             </v-list-item-action>
 
             <v-list-item-content>
@@ -131,7 +131,7 @@
           <v-list-group v-model="relatorioGroup">
             <template v-slot:activator>
               <v-list-item-action>
-                <v-icon color="sidebarcolor">mdi-chart-sankey </v-icon>
+                <v-icon color="#757575">mdi-chart-sankey </v-icon>
               </v-list-item-action>
 
               <v-list-item-title>Relatórios</v-list-item-title>
@@ -174,7 +174,7 @@
           </v-list-group>
           <v-list-item to="/usuarios" v-show="papelUsuario == 2">
             <v-list-item-action>
-              <v-icon color="sidebarcolor">mdi-cog-outline </v-icon>
+              <v-icon color="#757575">mdi-cog-outline </v-icon>
             </v-list-item-action>
 
             <v-list-item-content>

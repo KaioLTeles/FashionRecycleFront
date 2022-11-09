@@ -130,6 +130,9 @@
               >mdi-clipboard-text-search</v-icon
             >
           </template>
+          <template v-slot:[`item.amountSale`]="{ item }">
+            {{ item.amountSale.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}
+          </template>
         </v-data-table>
       </v-card-text>
     </v-card>

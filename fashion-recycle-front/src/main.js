@@ -6,12 +6,15 @@ import vuetify from "./plugins/vuetify";
 import moment from "vue-moment";
 import VueMask from "v-mask";
 import VueExcelXlsx from "vue-excel-xlsx";
+import VuetifyMoney from "vuetify-money";
 
 import { AUTENTICAR } from "./store/types/UsuarioType";
 
 Vue.config.productionTip = false;
 
 Vue.use(moment);
+
+Vue.use(VuetifyMoney);
 
 Vue.use(VueExcelXlsx);
 
@@ -30,3 +33,5 @@ new Vue({
   },
   render: (h) => h(App),
 }).$mount("#app");
+
+export default VuetifyMoney;

@@ -103,6 +103,9 @@
           :items="listaRelatorioContasAPagar"
           :loading="loadingDataTable"
         >
+        <template v-slot:[`item.amount`]="{ item }">
+            {{ item.amount.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}
+          </template>
         </v-data-table>
       </v-card-text>
     </v-card>

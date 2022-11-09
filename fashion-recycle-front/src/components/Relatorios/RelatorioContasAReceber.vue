@@ -83,7 +83,14 @@
           :items="listaRelatorioContasReceber"
           :loading="loadingDataTable"
         >
-          
+          <template v-slot:[`item.amout`]="{ item }">
+            {{
+              item.amout.toLocaleString("pt-br", {
+                style: "currency",
+                currency: "BRL",
+              })
+            }}
+          </template>
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -148,23 +155,23 @@ export default {
       this.$store
         .dispatch(BUSCARRELATORIOCONTASARECEBER, payload)
         .then(() => {
-          this.loadingDataTable = false;        
-          
-          let tempList = [];        
+          this.loadingDataTable = false;
+
+          let tempList = [];
           tempList = this.listaRelatorioContasReceber;
 
-          tempList.forEach(function(item) {
-            item.status = item.status == true ? "Recebido" : "Em aberto"
+          tempList.forEach(function (item) {
+            item.status = item.status == true ? "Recebido" : "Em aberto";
           });
 
           this.listaItensExport = tempList;
-
         })
         .catch((error) => {
           if (error) {
             this.loadingDataTable = false;
             let payload = {
-              message: "Ocorreu um erro ao carregar O relatório de contas a receber!",
+              message:
+                "Ocorreu um erro ao carregar O relatório de contas a receber!",
               color: "error",
             };
             this.alertaParaUsuario(payload);
@@ -187,8 +194,7 @@ export default {
       return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
     },
   },
-  created() {
-  },
+  created() {},
   computed: {
     listaRelatorioContasReceber() {
       return this.$store.state.RelatorioStore.relContasAReceber;

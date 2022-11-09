@@ -67,7 +67,7 @@
               item-value="id"
               item-text="name"
               v-model="clientForm"
-              clearable              
+              clearable
               :loading="loadingCampoCliente"
             ></v-autocomplete>
           </v-col>
@@ -96,8 +96,16 @@
           v-model="selected"
           class="elevation-1"
         >
-        <template v-slot:[`item.status`]="{ item }">
+          <template v-slot:[`item.status`]="{ item }">
             {{ item.status == true ? "Recebido" : "Em Aberto" }}
+          </template>
+          <template v-slot:[`item.amout`]="{ item }">
+            {{
+              item.amout.toLocaleString("pt-br", {
+                style: "currency",
+                currency: "BRL",
+              })
+            }}
           </template>
         </v-data-table>
       </v-card-text>
@@ -106,7 +114,10 @@
 </template>
 
 <script>
-import { BUSCARTODOSRECEBIMENTOS, ALTERARRECEBIMENTO } from "@/store/types/PagamentosType";
+import {
+  BUSCARTODOSRECEBIMENTOS,
+  ALTERARRECEBIMENTO,
+} from "@/store/types/PagamentosType";
 
 import { BUSCARLISTACLIENTERESUMIDA } from "@/store/types/ClienteType";
 
@@ -119,10 +130,10 @@ export default {
       headers: [
         { text: "Data da Venda", value: "saleDateFormated" },
         { text: "Comprador", value: "clientName" },
-        { text: "Histórico", value: "name" },        
+        { text: "Histórico", value: "name" },
         { text: "Valor", value: "amout" },
         { text: "Data a Receber", value: "recieveDateFormated" },
-        { text: "Status", value: "status" },        
+        { text: "Status", value: "status" },
       ],
       codigoFilter: "",
       clientForm: 0,
@@ -147,7 +158,6 @@ export default {
     salvar() {
       if (this.selected.length > 0) {
         this.alterarStatusRecebimento(this.selected[0].id);
-
       } else {
         let payload = {
           message: "Nenhum recebimento selecionado!",
@@ -216,15 +226,15 @@ export default {
           }
         });
     },
-    alterarStatusRecebimento(payload){
-        this.$store
+    alterarStatusRecebimento(payload) {
+      this.$store
         .dispatch(ALTERARRECEBIMENTO, payload)
         .then(() => {
           let payload = {
-              message: "Recebimento Alterado com sucesso!",
-              color: "success",
-            };
-            this.alertaParaUsuario(payload);
+            message: "Recebimento Alterado com sucesso!",
+            color: "success",
+          };
+          this.alertaParaUsuario(payload);
         })
         .catch((error) => {
           this.loadingCampoCliente = false;
@@ -236,7 +246,7 @@ export default {
             this.alertaParaUsuario(payload);
           }
         });
-    }
+    },
   },
   created() {
     this.carregarCampoCiente();

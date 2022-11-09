@@ -88,13 +88,18 @@
           <template v-slot:[`item.paymentMade`]="{ item }">
              {{ item.paymentMade == true ? "Liquidado" : "Em Aberto" }}
           </template>
+          <template v-slot:[`item.amount`]="{ item }">
+            {{ item.amount.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}
+          </template>
         </v-data-table>
       </v-card-text>
     </v-card>
     <CadastrarPagamentoModal
       v-model="mostrarJanela"
+      v-if="mostrarJanela"
       :codigoPagamento="codigoPagamento"
       @resetarCodigoPayment="resetarCodigoPayment"
+      @pesquisar="pesquisar"
     />
   </div>
 </template>

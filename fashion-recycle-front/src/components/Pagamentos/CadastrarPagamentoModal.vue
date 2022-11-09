@@ -31,12 +31,12 @@
                   ></v-autocomplete>
                 </v-col>
                 <v-col cols="12">
-                  <v-text-field
+                  <vuetify-money
                     label="Valor do Pagamento"
                     v-model="valorForm"
-                    type="number"
                     clearable
-                  ></v-text-field>
+                    v-bind:options="options"
+                  ></vuetify-money>
                 </v-col>
                 <v-col cols="12">
                   <v-menu
@@ -68,7 +68,10 @@
                   <v-checkbox v-model="pagoForm" label="Pagamento Liquidado" />
                 </v-col>
                 <v-col cols="12">
-                  <v-checkbox v-model="pagRecorrentForm" label="Pagamento Recorrente" />
+                  <v-checkbox
+                    v-model="pagRecorrentForm"
+                    label="Pagamento Recorrente"
+                  />
                 </v-col>
               </v-row>
             </v-form>
@@ -113,7 +116,14 @@ export default {
       historicoForm: "",
       tipoDespesaForm: 0,
       pagoForm: false,
-      pagRecorrentForm: false
+      pagRecorrentForm: false,
+      options: {
+        locale: "pt-BR",
+        prefix: "R$",
+        suffix: "",
+        length: 11,
+        precision: 2,
+      },
     };
   },
   computed: {
@@ -155,6 +165,7 @@ export default {
         { Codigo: 10, Descricao: "Despesa com Materiais de Escritório" },
         { Codigo: 11, Descricao: "Despesa com Limpeza e Conservação" },
         { Codigo: 12, Descricao: "Receita com Vendas (Comissões)" },
+        { Codigo: 13, Descricao: "Despesas com Internet" },
       ];
       return array;
     },
@@ -205,11 +216,12 @@ export default {
         id: this.codigoForm,
         name: this.historicoForm,
         idPaymentType: this.tipoDespesaForm,
-        amount: this.valorForm,
+        amount: parseFloat(this.valorForm),
         paymentDate: this.date.initialDate,
         paymentMade: this.pagoForm,
-        recurringPayment: this.pagRecorrentForm
+        recurringPayment: this.pagRecorrentForm,
       };
+      console.log(payload);
 
       this.$store
         .dispatch(CRIAROUALTERARPAGAMENTO, payload)
@@ -220,6 +232,7 @@ export default {
             color: "success",
           };
           this.alertaParaUsuario(payload);
+          this.$emit("pesquisar");
           this.fechar();
         })
         .catch((error) => {
@@ -245,7 +258,7 @@ export default {
             this.carregarDadosForm();
           })
           .catch((error) => {
-            console.log(error)
+            console.log(error);
             if (error) {
               let payload = {
                 message: "Ocorreu um erro ao carregar os dados do pagamento",
@@ -267,7 +280,7 @@ export default {
       this.codigoForm = "0";
       this.parceiroForm = 0;
       this.fornecedorForm = 0;
-      this.valorForm = 0;
+      this.valorForm = "0";
       this.ativoForm = false;
       this.historicoForm = "";
     },
@@ -276,10 +289,9 @@ export default {
       this.valorForm = this.pagamentoSelecionado.amount;
       this.historicoForm = this.pagamentoSelecionado.name;
       this.tipoDespesaForm = this.pagamentoSelecionado.paymenyType.id;
-      this.pagoForm = this.pagamentoSelecionado.paymentMade
-      this.date.initialDate = this.pagamentoSelecionado.paymentDateFormated
-      this.pagRecorrentForm = this.pagamentoSelecionado.recurringPayment
-      ;
+      this.pagoForm = this.pagamentoSelecionado.paymentMade;
+      this.date.initialDate = this.pagamentoSelecionado.paymentDateFormated;
+      this.pagRecorrentForm = this.pagamentoSelecionado.recurringPayment;
     },
     alertaParaUsuario(payload) {
       this.$store.commit(SET_MESSAGE, payload);

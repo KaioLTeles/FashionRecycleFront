@@ -33,10 +33,18 @@
           </v-col>
         </v-card-actions>
 
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Buscar Marca"
+          single-line
+          hide-details          
+        ></v-text-field>
         <v-card-text>
           <v-data-table
             :headers="headers"
             item-key="codigo"
+            :search="search"
             :items="listaMarcas"
             :loading="loadingDataTable"
           >
@@ -92,6 +100,7 @@ export default {
       nomeForm: "",
       codigoForm: 0,
       loadingDataTable: false,
+      search: "",
     };
   },
   methods: {

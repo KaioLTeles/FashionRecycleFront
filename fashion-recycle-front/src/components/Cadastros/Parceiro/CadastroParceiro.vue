@@ -72,6 +72,7 @@
       v-model="mostrarJanela"
       :codigoParceiro="codigoParceiro"
       @resetarCodigoParceiro="resetarCodigoParceiro"
+      @pesquisar="pesquisar"
     />
   </div>
 </template>

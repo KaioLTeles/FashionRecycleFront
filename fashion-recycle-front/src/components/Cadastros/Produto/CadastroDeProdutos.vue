@@ -61,6 +61,12 @@
           :items="listaProdutos"
           :loading="loadingDataTable"
         >
+          <template v-slot:[`item.pricePartner`]="{ item }">
+            {{ item.pricePartner.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}
+          </template>
+          <template v-slot:[`item.priceSale`]="{ item }">
+            {{ item.priceSale.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}) }}
+          </template>
           <template v-slot:[`item.action`]="{ item }">
             <v-icon color="btnPrimary" @click.stop="alterarProduto(item)"
               >mdi-pencil</v-icon
@@ -85,6 +91,7 @@
       :codigoProduto="codigoProduto"
       :modoVisualizacao="modoVisualizacao"
       @resetarCodigoProduto="resetarCodigoProduto"
+      @pesquisar="pesquisar"
     />
     <CadastroDeMarcas v-model="mostrarJanelaMarca" />
   </div>
@@ -116,8 +123,7 @@ export default {
         { text: "Valor Revenda", value: "priceSale" },
         { text: "Fornecedor", value: "partnerName" },
         { text: "Data da Entrada", value: "creationDateFormat" },
-        { text: "Status", value: "productStatusDescription" },
-        { text: "Ativo", value: "active" },
+        { text: "Status", value: "productStatusDescription" },        
         { text: "Alterar", value: "action", sortable: false },
         { text: "Visualização", value: "action2", sortable: false },
       ],
@@ -131,6 +137,7 @@ export default {
       parceiroFilter: null,
       codigoProduto: 0,
       margem: "30%",
+      modoVisualizacao: false,
     };
   },
   methods: {
@@ -176,7 +183,7 @@ export default {
     alterarProduto(item) {
       this.codigoProduto = item.id;
       this.mostrarJanela = true;
-    },    
+    },
     verProduto(item) {
       this.modoVisualizacao = true;
       this.codigoProduto = item.id;

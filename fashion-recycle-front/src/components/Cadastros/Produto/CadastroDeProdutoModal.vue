@@ -32,7 +32,7 @@
                     label="Item*"
                     v-model="nomeForm"
                     clearable
-                    :disabled="modoVisualizacao"
+                    :readonly="modoVisualizacao"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
@@ -40,21 +40,21 @@
                     label="Modelo*"
                     v-model="modeloForm"
                     clearable
-                    :disabled="modoVisualizacao"
+                    :readonly="modoVisualizacao"
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
                     label="Número de Série"
                     v-model="serieForm"
-                    :disabled="modoVisualizacao"
+                    :readonly="modoVisualizacao"
                     clearable
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
                     label="Cor*"
-                    :disabled="modoVisualizacao"
+                    :readonly="modoVisualizacao"
                     v-model="corForm"
                     clearable
                   ></v-text-field>
@@ -62,11 +62,12 @@
                 <v-col cols="12">
                   <v-autocomplete
                     dense
-                    label="Marca"
+                    label="Marca*"
                     :items="listaMarcas"
                     item-value="id"
                     item-text="name"
-                    :disabled="modoVisualizacao"
+                    :rules="marcaRule"
+                    :readonly="modoVisualizacao"
                     v-model="marcaForm"
                     clearable
                     :loading="loadingParceiros"
@@ -74,65 +75,63 @@
                 </v-col>
                 <v-col cols="12">
                   <v-textarea
-                    label="Situação Do Produto*"
+                    label="Detalhamento do Produto*"
                     v-model="situacaoForm"
-                    :disabled="modoVisualizacao"
+                    :readonly="modoVisualizacao"
                   ></v-textarea>
                 </v-col>
                 <v-col cols="12">
                   <v-autocomplete
                     dense
-                    label="Fornecedor"
+                    label="Fornecedor*"
                     :items="listaParceirosResumida"
                     item-value="id"
                     item-text="name"
                     v-model="parceiroForm"
-                    :disabled="modoVisualizacao"
+                    :readonly="modoVisualizacao"
                     clearable
+                    :rules="fornecedorRule"
                     :loading="loadingParceiros"
                   ></v-autocomplete>
                 </v-col>
                 <v-col cols="12">
                   <v-select
                     dense
-                    label="Status"
+                    label="Status*"
                     :items="listStatus"
-                    :disabled="modoVisualizacao"
+                    :readonly="modoVisualizacao"
+                    :rules="statusRule"
                     item-value="id"
                     item-text="name"
-                    
                     v-model="statusForm"
                   ></v-select>
                 </v-col>
                 <v-col cols="12">
-                  <v-text-field
+                  <vuetify-money
                     label="Preço Fornecedor*"
                     v-model="precoParceiroForm"
-                    :disabled="modoVisualizacao"
-                    type="number"
                     clearable
-                  ></v-text-field>
+                    :readonly="modoVisualizacao"
+                    v-bind:options="options"
+                  ></vuetify-money>
                 </v-col>
                 <v-col cols="12">
-                  <v-text-field
+                  <vuetify-money
                     label="Preço Venda*"
                     v-model="precoVendaForm"
-                    :disabled="modoVisualizacao"
-                    type="number"
                     clearable
-                  ></v-text-field>
+                    :readonly="modoVisualizacao"
+                    v-bind:options="options"
+                  ></vuetify-money>
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
                     label="Margem%"
-                    v-model="margemForm"                    
+                    v-model="margemForm"
                     disabled
                     type="number"
                     clearable
                   ></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                  <v-checkbox v-model="ativoForm" label="Ativo" :disabled="modoVisualizacao"/>
                 </v-col>
               </v-row>
             </v-form>
@@ -141,7 +140,13 @@
         <v-card-actions>
           <v-spacer />
           <v-btn color="info" outlined @click.stop="fechar"> Cancelar </v-btn>
-          <v-btn v-show="!modoVisualizacao" @click="salvar()" dark color="btnPrimary">Salvar</v-btn>
+          <v-btn
+            v-show="!modoVisualizacao"
+            @click="salvar()"
+            dark
+            color="btnPrimary"
+            >Salvar</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -182,6 +187,16 @@ export default {
       modeloForm: "",
       margemForm: 0,
       idBanco: 0,
+      statusRule: [(v) => !!v || "Status é Obrigatório"],
+      marcaRule: [(v) => !!v || "Marca do Produto é obrigatório"],
+      fornecedorRule: [(v) => !!v || "Fornecedor é obrigatório"],
+      options: {
+        locale: "pt-BR",
+        prefix: "R$",
+        suffix: "",
+        length: 11,
+        precision: 2,
+      },
     };
   },
   computed: {
@@ -240,25 +255,28 @@ export default {
       this.show = !this.show;
     },
     salvar() {
-      if (this.precoVendaForm > 0.0 && this.precoParceiroForm > 0.0) {
-        console.log(this.precoParceiroForm + "-" + this.precoVendaForm);
-        if (
-          parseFloat(this.precoParceiroForm) > parseFloat(this.precoVendaForm)
-        ) {
+      if (this.$refs.form.validate()) {
+        if (this.precoVendaForm > 0.0 && this.precoParceiroForm > 0.0) {
+          console.log(this.precoParceiroForm + "-" + this.precoVendaForm);
+          if (
+            parseFloat(this.precoParceiroForm) > parseFloat(this.precoVendaForm)
+          ) {
+            let payload = {
+              message:
+                "O preço do fornecedor não pode ser maior que o de venda!",
+              color: "warning",
+            };
+            this.alertaParaUsuario(payload);
+          } else {
+            this.gravarProduto();
+          }
+        } else {
           let payload = {
-            message: "O preço do fornecedor não pode ser maior que o de venda!",
+            message: "Favor preencher todos os campos Obrigatórios!",
             color: "warning",
           };
           this.alertaParaUsuario(payload);
-        } else {
-          this.gravarProduto();
         }
-      } else {
-        let payload = {
-          message: "Favor preencher todos os campos Obrigatórios!",
-          color: "warning",
-        };
-        this.alertaParaUsuario(payload);
       }
     },
     gravarProduto() {
@@ -274,7 +292,7 @@ export default {
         pricePartner: parseFloat(this.precoParceiroForm),
         priceSale: parseFloat(this.precoVendaForm),
         partnerId: this.parceiroForm,
-        active: this.ativoForm,
+        active: true,
         productStatus: this.statusForm,
         serialNumber: this.serieForm,
         model: this.modeloForm,
@@ -293,6 +311,7 @@ export default {
               color: "success",
             };
             this.alertaParaUsuario(payload);
+            this.$emit("pesquisar");
             this.fechar();
           } else {
             let payload = {
@@ -300,6 +319,7 @@ export default {
               color: "success",
             };
             this.alertaParaUsuario(payload);
+            this.$emit("pesquisar");
             this.fechar();
           }
         })
@@ -400,8 +420,8 @@ export default {
   watch: {
     precoVendaForm() {
       this.margemForm =
-        ((this.precoVendaForm - this.precoParceiroForm) /
-          this.precoParceiroForm) *
+        (parseFloat(this.precoVendaForm - parseFloat(this.precoParceiroForm)) /
+          parseFloat(this.precoParceiroForm)) *
         100;
     },
   },

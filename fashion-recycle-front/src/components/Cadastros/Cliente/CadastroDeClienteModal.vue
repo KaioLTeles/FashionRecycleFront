@@ -113,13 +113,12 @@ export default {
       enderecoForm: "",
       numeroForm: "",
       cepForm: "",
-      ativoForm: true,
+      ativoForm: null,
     };
   },
   computed: {
     show: {
-      get() {
-        this.buscarCliente();
+      get() {        
         return this.value;
       },
       set(value) {
@@ -129,6 +128,9 @@ export default {
     clienteSelecionado() {
       return this.$store.state.ClienteStore.clientObjeto;
     },
+  },
+  created(){
+    this.buscarCliente();
   },
   updated() {},
   beforeUpdate() {},
@@ -174,6 +176,7 @@ export default {
               color: "success",
             };
             this.alertaParaUsuario(payload);
+            this.$emit("pesquisar");
             this.fechar();
           } else {
             let payload = {
@@ -181,6 +184,7 @@ export default {
               color: "success",
             };
             this.alertaParaUsuario(payload);
+            this.$emit("pesquisar");
             this.fechar();
           }
         })
@@ -203,7 +207,8 @@ export default {
       this.show = !this.show;
     },
     async buscarCliente() {
-      if (this.codigoCliente != 0) {
+      if (this.codigoCliente != 0 || this.codigoCliente != "0" ) {
+        console.log("entrou no if");
         let payload = {
           idClient: this.codigoCliente,
         };
@@ -223,11 +228,16 @@ export default {
             }
           });
       }
+      else{
+        console.log("entrou no else");
+        this.ativoForm = true;
+      }
     },
     alertaParaUsuario(payload) {
       this.$store.commit(SET_MESSAGE, payload);
     },
     carregarDadosForm() {
+      console.log(this.clienteSelecionado.active);
       this.codigoForm = this.clienteSelecionado.id;
       this.nomeForm = this.clienteSelecionado.name;
       this.emailForm = this.clienteSelecionado.email;
@@ -237,6 +247,7 @@ export default {
       this.numeroForm = this.clienteSelecionado.streetNumber;
       this.cepForm = this.clienteSelecionado.cep;
       this.ativoForm = this.clienteSelecionado.active;
+      console.log(this.ativoForm);
     },
     limparCamposForm() {
       this.codigoForm = 0;

@@ -70,8 +70,10 @@
     </v-card>
     <CadastroDeClienteModal
       v-model="mostrarJanela"
+      v-if="mostrarJanela"
       :codigoCliente="codigoCliente"
       @resetarCodigoCliente="resetarCodigoCliente"
+      @pesquisar="pesquisar"
     />
   </div>
 </template>
