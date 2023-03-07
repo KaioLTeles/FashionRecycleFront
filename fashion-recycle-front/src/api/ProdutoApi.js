@@ -33,7 +33,13 @@ const AlterarOuCriarProduto = async function (payload) {
     colour: payload.colour,
     observation: payload.observation,
     brandId: payload.brandId,
-    margim: payload.margim
+    margim: payload.margim,
+    Content: payload.Content,
+    Size: payload.Size,
+    Size_BR: payload.Size_BR,
+    Size_Sola: payload.Size_Sola,
+    ItemRelated: payload.ItemRelated,
+    ApprovalDate: payload.ApprovalDate
   });
 };
 
